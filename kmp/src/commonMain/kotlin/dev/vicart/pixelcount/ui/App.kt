@@ -12,9 +12,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dev.vicart.pixelcount.ui.screens.AddExpenseGroupScreen
+import dev.vicart.pixelcount.ui.screens.ExpenseDetailScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseListScreen
 import dev.vicart.pixelcount.ui.screens.Screens
 import dev.vicart.pixelcount.ui.theme.AppTheme
+import dev.vicart.pixelcount.ui.transition.TransitionAxis
+import dev.vicart.pixelcount.ui.transition.rememberMaterialTransition
+import dev.vicart.pixelcount.ui.transition.transitionAxisMetadata
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -29,11 +33,14 @@ fun App() = AppTheme {
                 polymorphic(NavKey::class) {
                     subclass(Screens.Expense.List::class)
                     subclass(Screens.AddExpenseGroup::class)
+                    subclass(Screens.Expense.Detail::class)
                 }
             }
         },
         Screens.Expense.List
     )
+
+    val materialTransition = rememberMaterialTransition()
 
     val strategy = rememberListDetailSceneStrategy<NavKey>()
 
@@ -44,12 +51,38 @@ fun App() = AppTheme {
                 metadata = ListDetailSceneStrategy.listPane(sceneKey = Screens.Expense)
             ) {
                 ExpenseListScreen(
-                    addExpenseGroup = { backStack.add(Screens.AddExpenseGroup) }
+                    addExpenseGroup = {
+                        backStack.add(Screens.AddExpenseGroup())
+                    },
+                    selectItem = {
+                        backStack.add(Screens.Expense.Detail(it))
+                    },
+                    selectedItem = backStack.findLast { it is Screens.Expense.Detail }?.let {
+                        (it as Screens.Expense.Detail).id
+                    }
                 )
             }
-            entry<Screens.AddExpenseGroup> {
+            entry<Screens.Expense.Detail>(
+                metadata = ListDetailSceneStrategy.detailPane(sceneKey = Screens.Expense)
+            ) {
+                ExpenseDetailScreen(
+                    item = it.id,
+                    onBack = {
+                        backStack.remove(it)
+                    },
+                    onEdit = {
+                        backStack.add(Screens.AddExpenseGroup(it))
+                    }
+                )
+            }
+            entry<Screens.AddExpenseGroup>(
+                metadata = transitionAxisMetadata(TransitionAxis.Y)
+            ) {
                 AddExpenseGroupScreen(
-                    onBack = { backStack.remove(it) }
+                    onBack = {
+                        backStack.remove(it)
+                    },
+                    initial = it.item
                 )
             }
         },
@@ -57,6 +90,9 @@ fun App() = AppTheme {
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
-        )
+        ),
+        transitionSpec = { with(materialTransition) { transitionSpec } },
+        popTransitionSpec = { with(materialTransition) { popTransitionSpec } },
+        predictivePopTransitionSpec = { with(materialTransition) { popTransitionSpec } }
     )
 }

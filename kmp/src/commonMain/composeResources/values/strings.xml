@@ -10,4 +10,8 @@
     <string name="your_name">Your name</string>
     <string name="participant_name">Participant name</string>
     <string name="john_doe">John Doe</string>
+    <string name="search_emoji">Search emoji</string>
+    <string name="created_by">Created by %1$s</string>
+    <string name="my_expenses">My expenses</string>
+    <string name="total_expenses">Total expenses</string>
 </resources>

@@ -6,9 +6,14 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.android.multiplatform.library)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
+
+    compilerOptions {
+        optIn.add("kotlin.uuid.ExperimentalUuidApi")
+    }
 
     androidLibrary {
         compileSdk = libs.versions.compileSdk.get().toInt()
@@ -40,6 +45,10 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.lifecycle.navigation3)
             implementation(libs.lifecycle.runtime)
+
+            implementation(libs.kotlinx.json)
+
+            implementation(libs.sqldelight.coroutines)
         }
 
         jvmMain.dependencies {
@@ -48,6 +57,10 @@ kotlin {
 
         commonTest.dependencies {
             implementation(kotlin("test"))
+        }
+
+        androidMain.dependencies {
+            implementation(libs.sqldelight.android)
         }
     }
 }
@@ -61,5 +74,13 @@ compose.resources {
 compose.desktop {
     application {
         mainClass = "dev.vicart.pixelcount.MainKt"
+    }
+}
+
+sqldelight {
+    databases {
+        create("PixelCountDatabase") {
+            packageName = "dev.vicart.pixelcount.data.database"
+        }
     }
 }

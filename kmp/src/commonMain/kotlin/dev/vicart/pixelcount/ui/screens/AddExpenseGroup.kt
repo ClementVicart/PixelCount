@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -30,9 +32,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
 import dev.vicart.pixelcount.resources.john_doe
@@ -43,6 +48,7 @@ import dev.vicart.pixelcount.resources.title
 import dev.vicart.pixelcount.resources.you
 import dev.vicart.pixelcount.resources.your_name
 import dev.vicart.pixelcount.ui.components.BackButton
+import dev.vicart.pixelcount.ui.components.EmojiPicker
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseGroupViewModel
 import org.jetbrains.compose.resources.stringResource
 
@@ -50,7 +56,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AddExpenseGroupScreen(
     onBack: () -> Unit,
-    vm: AddExpenseGroupViewModel = viewModel { AddExpenseGroupViewModel() }
+    initial: ExpenseGroup? = null,
+    vm: AddExpenseGroupViewModel = viewModel { AddExpenseGroupViewModel(initial) }
 ) {
     Scaffold(
         topBar = {
@@ -73,7 +80,19 @@ fun AddExpenseGroupScreen(
                 onValueChange = { vm.title.value = it },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 label = { Text(stringResource(Res.string.title)) },
-                placeholder = { Text(stringResource(Res.string.ski_vacations)) }
+                placeholder = { Text(stringResource(Res.string.ski_vacations)) },
+                leadingIcon = {
+                    val emoji by vm.emoji.collectAsStateWithLifecycle()
+                    EmojiPicker(
+                        emoji = emoji,
+                        onEmojiSelected = { vm.emoji.value = it }
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                ),
+                singleLine = true
             )
 
             Surface(
@@ -98,7 +117,11 @@ fun AddExpenseGroupScreen(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text(stringResource(Res.string.you)) },
                         placeholder = { Text(stringResource(Res.string.your_name)) },
-                        singleLine = true
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
+                        )
                     )
 
                     val participants by vm.participants.collectAsStateWithLifecycle()
@@ -137,7 +160,17 @@ fun AddExpenseGroupScreen(
                             ) {
                                 Icon(Icons.Default.PersonAdd, null)
                             }
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                vm.addParticipant(newParticipantName)
+                                newParticipantName = ""
+                            }
+                        )
                     )
                 }
             }
@@ -159,7 +192,10 @@ private fun TopBar(
         actions = {
             val enabled by vm.canAdd.collectAsStateWithLifecycle(false)
             FilledTonalIconButton(
-                onClick = {},
+                onClick = {
+                    vm.saveExpenseGroup()
+                    onBack()
+                },
                 shapes = IconButtonDefaults.shapes(),
                 modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
                     widthOption = IconButtonDefaults.IconButtonWidthOption.Wide

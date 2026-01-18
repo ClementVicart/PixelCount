@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 import kotlin.uuid.Uuid
 
 @Serializable
-data class ExpenseGroup(
+data class Expense(
     val id: Uuid = Uuid.random(),
-    val emoji: String,
-    val title: String,
-    val participants: List<Participant>,
-    val expenses: List<Expense>
+    val label: String,
+    val amount: Double,
+    val paidBy: Participant,
+    val sharedWith: List<Participant>
 )

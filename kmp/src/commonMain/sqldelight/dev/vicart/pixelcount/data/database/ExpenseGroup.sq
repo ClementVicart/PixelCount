@@ -1,0 +1,31 @@
+import kotlin.uuid.Uuid;
+import kotlin.Boolean;
+
+CREATE TABLE IF NOT EXISTS ExpenseGroup (
+    id TEXT AS Uuid PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    emoji TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ExpenseParticipant (
+    id TEXT AS Uuid PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    eg_id TEXT AS Uuid NOT NULL,
+    mandatory INTEGER AS Boolean NOT NULL,
+    FOREIGN KEY (eg_id) REFERENCES ExpenseGroup(id)
+);
+
+CREATE TABLE IF NOT EXISTS ExpenseGroupExpense (
+    id TEXT AS Uuid PRIMARY KEY NOT NULL,
+    amount REAL NOT NULL,
+    label TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ExpenseGroupExpenseParticipant (
+    ege_id TEXT AS Uuid NOT NULL,
+    ep_id TEXT AS Uuid NOT NULL,
+    payer INTEGER AS Boolean NOT NULL,
+    PRIMARY KEY (ege_id, ep_id),
+    FOREIGN KEY(ege_id) REFERENCES ExpenseGroupExpense(id),
+    FOREIGN KEY(ep_id) REFERENCES ExpenseParticipant(id)
+) WITHOUT ROWID;
