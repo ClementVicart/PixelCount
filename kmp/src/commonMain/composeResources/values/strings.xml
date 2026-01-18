@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="expense_groups">Expense groups</string>
+    <string name="no_expense_yet">No expense yet</string>
+    <string name="add_expense_group">Add an expense group</string>
+    <string name="title">Title</string>
+    <string name="ski_vacations">Ski vacations</string>
+    <string name="participants">Participants</string>
+    <string name="you">You</string>
+    <string name="your_name">Your name</string>
+    <string name="participant_name">Participant name</string>
+    <string name="john_doe">John Doe</string>
+</resources>

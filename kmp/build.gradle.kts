@@ -12,9 +12,12 @@ kotlin {
 
     androidLibrary {
         compileSdk = libs.versions.compileSdk.get().toInt()
-        namespace = "com.example.kmp"
+        namespace = "dev.vicart.pixelcount.kmp"
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11 // Max supported version for Android
+        }
+        androidResources {
+            enable = true
         }
     }
 
@@ -30,10 +33,13 @@ kotlin {
             implementation(libs.compose.runtime)
             implementation(libs.compose.ui)
             implementation(libs.compose.material3)
+            implementation(libs.compose.material3.adaptive.navigation3)
             implementation(libs.compose.material.icons.core)
             implementation(libs.compose.material.icons.extended)
             implementation(libs.compose.navigation3.ui)
             implementation(libs.compose.components.resources)
+            implementation(libs.lifecycle.navigation3)
+            implementation(libs.lifecycle.runtime)
         }
 
         jvmMain.dependencies {
@@ -48,12 +54,12 @@ kotlin {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.example.kmp"
+    packageOfResClass = "dev.vicart.pixelcount.resources"
     generateResClass = always
 }
 
 compose.desktop {
     application {
-        mainClass = "comp.example.kmp.MainKt"
+        mainClass = "dev.vicart.pixelcount.MainKt"
     }
 }

@@ -1,4 +1,4 @@
-rootProject.name = "kmp-android-app-template"
+rootProject.name = "PixelCount"
 
 pluginManagement {
     repositories {

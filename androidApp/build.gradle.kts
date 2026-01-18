@@ -13,14 +13,14 @@ kotlin {
 }
 
 android {
-    namespace = "com.example.kmp"
+    namespace = "dev.vicart.pixelcount"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         targetSdk = libs.versions.compileSdk.get().toInt()
         minSdk = libs.versions.minSdk.get().toInt()
 
-        applicationId = "com.example.kmp"
+        applicationId = "dev.vicart.pixelcount"
         versionName = "1.0.0"
         versionCode = 1
     }
@@ -32,6 +32,26 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    signingConfigs {
+//        create("release") {
+//            storeFile = file(providers.gradleProperty("android.sign.storeFile").get())
+//            keyAlias = providers.gradleProperty("android.sign.alias").get()
+//            storePassword = providers.gradleProperty("android.sign.storePassword").get()
+//            keyPassword = providers.gradleProperty("android.sign.keyPassword").get()
+//        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt")
+            )
+            //signingConfig = signingConfigs.getByName("release")
+        }
     }
 }
 
