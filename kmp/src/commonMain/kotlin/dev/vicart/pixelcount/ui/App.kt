@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dev.vicart.pixelcount.ui.screens.AddExpenseGroupScreen
+import dev.vicart.pixelcount.ui.screens.AddExpenseScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseDetailScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseListScreen
 import dev.vicart.pixelcount.ui.screens.Screens
@@ -34,6 +35,7 @@ fun App() = AppTheme {
                     subclass(Screens.Expense.List::class)
                     subclass(Screens.AddExpenseGroup::class)
                     subclass(Screens.Expense.Detail::class)
+                    subclass(Screens.AddExpense::class)
                 }
             }
         },
@@ -72,6 +74,9 @@ fun App() = AppTheme {
                     },
                     onEdit = {
                         backStack.add(Screens.AddExpenseGroup(it))
+                    },
+                    onAddExpense = {
+                        backStack.add(Screens.AddExpense(it.id))
                     }
                 )
             }
@@ -83,6 +88,14 @@ fun App() = AppTheme {
                         backStack.remove(it)
                     },
                     initial = it.item
+                )
+            }
+            entry<Screens.AddExpense> {
+                AddExpenseScreen(
+                    onBack = {
+                        backStack.remove(it)
+                    },
+                    itemId = it.itemId
                 )
             }
         },

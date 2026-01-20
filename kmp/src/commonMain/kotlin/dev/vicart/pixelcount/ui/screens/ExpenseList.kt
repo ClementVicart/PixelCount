@@ -85,9 +85,7 @@ fun ExpenseListScreen(
                                 }
                             )
                         },
-                        colors = ListItemDefaults.colors().copy(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
+                        tonalElevation = if(selectedItem == it.id) 4.dp else 1.dp,
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.medium)
                             .selectable(selected = selectedItem == it.id) {

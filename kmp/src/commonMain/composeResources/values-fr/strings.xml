@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="expense_groups">Groupes de dépenses</string>
+    <string name="no_expense_yet">Pas de dépense pour le moment</string>
+    <string name="add_expense_group">Ajouter un groupe de dépense</string>
+    <string name="title">Titre</string>
+    <string name="ski_vacations">Vacances au ski</string>
+    <string name="participants">Participants</string>
+    <string name="you">Vous</string>
+    <string name="your_name">Votre nom</string>
+    <string name="participant_name">Nom du participant</string>
+    <string name="john_doe">John Doe</string>
+    <string name="search_emoji">Chercher un emoji</string>
+    <string name="created_by">Créé par %1$s</string>
+    <string name="my_expenses">Mes dépenses</string>
+    <string name="total_expenses">Total des dépenses</string>
+    <string name="expenses">Dépenses</string>
+    <string name="balance">Equilibre</string>
+    <string name="add_expense">Ajouter une dépense</string>
+</resources>

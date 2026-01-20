@@ -39,7 +39,8 @@ private val selectAllMapper = { lst: List<SelectAll> ->
                     },
                     sharedWith = participants.filter { participant ->
                         it.value.filter { it.payer == false }.map { it.id_ }.contains(participant.id)
-                    }
+                    },
+                    datetime = it.value.first().datetime!!
                 )
             }
         )

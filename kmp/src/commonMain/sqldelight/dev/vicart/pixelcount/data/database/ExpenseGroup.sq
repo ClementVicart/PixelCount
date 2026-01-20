@@ -1,5 +1,6 @@
 import kotlin.uuid.Uuid;
 import kotlin.Boolean;
+import kotlin.time.Instant;
 
 CREATE TABLE IF NOT EXISTS ExpenseGroup (
     id TEXT AS Uuid PRIMARY KEY NOT NULL,
@@ -18,7 +19,8 @@ CREATE TABLE IF NOT EXISTS ExpenseParticipant (
 CREATE TABLE IF NOT EXISTS ExpenseGroupExpense (
     id TEXT AS Uuid PRIMARY KEY NOT NULL,
     amount REAL NOT NULL,
-    label TEXT NOT NULL
+    label TEXT NOT NULL,
+    datetime INTEGER AS Instant NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ExpenseGroupExpenseParticipant (

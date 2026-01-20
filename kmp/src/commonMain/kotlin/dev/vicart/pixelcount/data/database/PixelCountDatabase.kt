@@ -3,6 +3,7 @@ package dev.vicart.pixelcount.data.database
 import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
 import dev.vicart.pixelcount.data.dao.ExpenseGroupDao
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 expect class DriverFactory {
@@ -19,6 +20,16 @@ private val uuidAdapter = object : ColumnAdapter<Uuid, String> {
     }
 }
 
+private val datetimeAdapter = object : ColumnAdapter<Instant, Long> {
+    override fun decode(databaseValue: Long): Instant {
+        return Instant.fromEpochSeconds(databaseValue)
+    }
+
+    override fun encode(value: Instant): Long {
+        return value.epochSeconds
+    }
+}
+
 fun createDatabase(driverFactory: DriverFactory) : PixelCountDatabase {
     val driver = driverFactory.createDriver()
     val database = PixelCountDatabase(
@@ -31,7 +42,8 @@ fun createDatabase(driverFactory: DriverFactory) : PixelCountDatabase {
             eg_idAdapter = uuidAdapter
         ),
         ExpenseGroupExpenseAdapter = ExpenseGroupExpense.Adapter(
-            idAdapter = uuidAdapter
+            idAdapter = uuidAdapter,
+            datetimeAdapter = datetimeAdapter
         ),
         ExpenseGroupExpenseParticipantAdapter = ExpenseGroupExpenseParticipant.Adapter(
             ege_idAdapter = uuidAdapter,

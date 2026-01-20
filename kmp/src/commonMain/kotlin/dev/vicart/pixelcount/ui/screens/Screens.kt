@@ -18,4 +18,7 @@ object Screens {
 
     @Serializable
     data class AddExpenseGroup(val item: ExpenseGroup? = null) : NavKey
+
+    @Serializable
+    data class AddExpense(val itemId: Uuid) : NavKey
 }

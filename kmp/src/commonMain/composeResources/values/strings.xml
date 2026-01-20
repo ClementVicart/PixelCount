@@ -14,4 +14,7 @@
     <string name="created_by">Created by %1$s</string>
     <string name="my_expenses">My expenses</string>
     <string name="total_expenses">Total expenses</string>
+    <string name="expenses">Expenses</string>
+    <string name="balance">Balance</string>
+    <string name="add_expense">Add an expense</string>
 </resources>

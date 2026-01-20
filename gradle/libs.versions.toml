@@ -2,6 +2,8 @@
 # Kotlin
 kotlin = "2.3.0"
 serialization = "1.9.0"
+coroutines = "1.10.2"
+datetime = "0.7.1"
 
 # Android
 agp = "9.0.0"
@@ -36,8 +38,11 @@ lifecycle-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-v
 lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 
 # Android

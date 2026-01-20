@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,10 +44,12 @@ import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.search_emoji
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.jetbrains.compose.resources.stringResource
+import kotlin.collections.emptyList
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalMaterial3Api::class
@@ -57,8 +61,8 @@ fun EmojiPicker(
 ) {
 
     val emojis by produceState(emptyMap()) {
-        launch(Dispatchers.IO) {
-            value = Res.readBytes("files/openmoji.json").inputStream().use {
+        value = withContext(Dispatchers.IO) {
+            Res.readBytes("files/openmoji.json").inputStream().use {
                 Json {
                     ignoreUnknownKeys = true
                 }.decodeFromStream<List<Emoji>>(it)
@@ -67,74 +71,64 @@ fun EmojiPicker(
         }
     }
 
-    Box(
-        contentAlignment = Alignment.TopEnd
+    var showPicker by remember { mutableStateOf(false) }
+    FilledTonalIconButton(
+        onClick = { showPicker = true },
+        shapes = IconButtonDefaults.shapes()
     ) {
-        var showPicker by remember { mutableStateOf(false) }
-        FilledTonalIconButton(
-            onClick = { showPicker = true },
-            shapes = IconButtonDefaults.shapes()
+        Text(
+            text = emoji,
+            fontSize = with(LocalDensity.current) {
+                IconButtonDefaults.smallIconSize.toSp()
+            }
+        )
+    }
+
+    if(showPicker) {
+        val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            onDismissRequest = { showPicker = false },
+            sheetState = state
         ) {
-            Text(
-                text = emoji,
-                fontSize = with(LocalDensity.current) {
-                    IconButtonDefaults.smallIconSize.toSp()
+
+            if(emojis.isNotEmpty()) {
+                val coroutineScope = rememberCoroutineScope()
+
+                val textFieldState = rememberTextFieldState()
+
+                val filteredEmojis by produceState(emptyList(), textFieldState.text, emojis) {
+                    value = withContext(Dispatchers.Default) {
+                        emojis.filter { it.value.any { it.contains(textFieldState.text) } }.toList()
+                    }
                 }
-            )
-        }
 
-        if(showPicker) {
-            val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-            ModalBottomSheet(
-                onDismissRequest = { showPicker = false },
-                sheetState = state
-            ) {
-
-                if(emojis.isNotEmpty()) {
-                    val coroutineScope = rememberCoroutineScope()
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        item {
-                            val searchbarState = rememberSearchBarState()
-                            val textFieldState = rememberTextFieldState()
-                            val inputField = @Composable {
-                                SearchBarDefaults.InputField(
-                                    textFieldState = textFieldState,
-                                    onSearch = {},
-                                    searchBarState = searchbarState,
-                                    placeholder = { Text(stringResource(Res.string.search_emoji)) }
-                                )
-                            }
-                            SearchBar(
-                                state = searchbarState,
-                                inputField = inputField,
-                                modifier = Modifier.fillMaxWidth()
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        val searchbarState = rememberSearchBarState()
+                        val inputField = @Composable {
+                            SearchBarDefaults.InputField(
+                                textFieldState = textFieldState,
+                                onSearch = {},
+                                searchBarState = searchbarState,
+                                placeholder = { Text(stringResource(Res.string.search_emoji)) }
                             )
-                            ExpandedFullScreenSearchBar(
-                                state = searchbarState,
-                                inputField = inputField
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    emojis.filter { it.value.any { it.contains(textFieldState.text) } }
-                                        .forEach { (key, value) ->
-                                            EmojiDisplay(key to value.filter { it.contains(textFieldState.text) }) {
-                                                onEmojiSelected(it)
-                                                coroutineScope.launch {
-                                                    state.hide()
-                                                    showPicker = false
-                                                }
-                                            }
-                                        }
-                                }
+                        }
+                        SearchBar(
+                            state = searchbarState,
+                            inputField = inputField,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    items(filteredEmojis, key = { it.first }) {
+                        val filteredGroupEmoji by produceState<Pair<String, List<Emoji>>?>(null, textFieldState.text) {
+                            value = withContext(Dispatchers.Default) {
+                                it.let { it.first to it.second.filter { it.contains(textFieldState.text) } }
                             }
                         }
-                        items(emojis.toList()) {
+                        filteredGroupEmoji?.let {
                             EmojiDisplay(it) {
                                 onEmojiSelected(it)
                                 coroutineScope.launch {
@@ -144,9 +138,9 @@ fun EmojiPicker(
                             }
                         }
                     }
-                } else {
-                    CircularWavyProgressIndicator()
                 }
+            } else {
+                CircularWavyProgressIndicator()
             }
         }
     }

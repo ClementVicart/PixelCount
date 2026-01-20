@@ -13,6 +13,7 @@ kotlin {
 
     compilerOptions {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
     androidLibrary {
@@ -47,12 +48,15 @@ kotlin {
             implementation(libs.lifecycle.runtime)
 
             implementation(libs.kotlinx.json)
+            implementation(libs.kotlinx.datetime)
 
             implementation(libs.sqldelight.coroutines)
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.sqldelight.jvm)
+            implementation(libs.kotlinx.coroutines.swing)
         }
 
         commonTest.dependencies {
@@ -81,6 +85,7 @@ sqldelight {
     databases {
         create("PixelCountDatabase") {
             packageName = "dev.vicart.pixelcount.data.database"
+            srcDirs("src/commonMain/sqldelight")
         }
     }
 }

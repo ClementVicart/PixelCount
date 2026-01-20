@@ -21,6 +21,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -134,7 +135,10 @@ fun AddExpenseGroupScreen(
                             singleLine = true,
                             trailingIcon = {
                                 FilledTonalIconButton(
-                                    onClick = { vm.deleteParticipant(participant) }
+                                    onClick = { vm.deleteParticipant(participant) },
+                                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer
+                                    )
                                 ) {
                                     Icon(Icons.Default.Delete, null)
                                 }
@@ -156,7 +160,10 @@ fun AddExpenseGroupScreen(
                                     vm.addParticipant(newParticipantName)
                                     newParticipantName = ""
                                 },
-                                enabled = newParticipantName.isNotBlank()
+                                enabled = newParticipantName.isNotBlank(),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
                             ) {
                                 Icon(Icons.Default.PersonAdd, null)
                             }
@@ -184,14 +191,14 @@ private fun TopBar(
     onBack: () -> Unit,
     vm: AddExpenseGroupViewModel
 ) {
-    TopAppBar(
+    MediumFlexibleTopAppBar(
         title = { Text(stringResource(Res.string.add_expense_group)) },
         navigationIcon = {
             BackButton(onBack)
         },
         actions = {
             val enabled by vm.canAdd.collectAsStateWithLifecycle(false)
-            FilledTonalIconButton(
+            FilledIconButton(
                 onClick = {
                     vm.saveExpenseGroup()
                     onBack()
