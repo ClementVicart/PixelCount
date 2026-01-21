@@ -1,3 +1,4 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,6 +9,9 @@ plugins {
     alias(libs.plugins.android.multiplatform.library)
     alias(libs.plugins.sqldelight)
 }
+
+group = "dev.vicart.pixelcount"
+version = "1.0.0"
 
 kotlin {
 
@@ -78,6 +82,7 @@ compose.resources {
 }
 
 compose.desktop {
+    this.application {}
     application {
         mainClass = "dev.vicart.pixelcount.MainKt"
         buildTypes {
@@ -85,6 +90,23 @@ compose.desktop {
                 proguard {
                     isEnabled = false
                 }
+            }
+        }
+
+        nativeDistributions {
+            packageName = "pixelcount"
+            vendor = "ClementVicart"
+            packageVersion = version.toString()
+
+            modules("java.sql")
+
+            targetFormats(TargetFormat.Exe, TargetFormat.Deb)
+
+            linux {
+                iconFile.set(project.file("assets/icon-192.png"))
+            }
+            windows {
+                iconFile.set(project.file("assets/favicon.ico"))
             }
         }
     }
