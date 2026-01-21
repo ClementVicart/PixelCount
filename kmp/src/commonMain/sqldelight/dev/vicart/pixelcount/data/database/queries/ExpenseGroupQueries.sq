@@ -9,16 +9,33 @@ selectWhereId:
 SELECT *
 FROM ExpenseGroup eg
 INNER JOIN ExpenseParticipant ep ON ep.eg_id=eg.id
+LEFT JOIN ExpenseGroupExpenseParticipant egep ON egep.ep_id=ep.id
+LEFT JOIN ExpenseGroupExpense ege ON ege.id=egep.ege_id
 WHERE eg.id=?;
 
 insertExpenseGroup:
-INSERT INTO ExpenseGroup(id, title, emoji) VALUES (?, ?, ?);
+INSERT INTO ExpenseGroup(id, title, emoji, currency) VALUES (?, ?, ?, ?);
 
 insertParticipant:
 INSERT INTO ExpenseParticipant(id, name, mandatory, eg_id) VALUES (?, ?, ?, ?);
 
 updateExpenseGroup:
-UPDATE ExpenseGroup SET title=?, emoji=? WHERE id=?;
+UPDATE ExpenseGroup SET title=?, emoji=?, currency=? WHERE id=?;
 
 deleteParticipantIdNotIn:
 DELETE FROM ExpenseParticipant WHERE id NOT IN ? AND eg_id=?;
+
+insertExpense:
+INSERT INTO ExpenseGroupExpense(id, type, label, amount, datetime) VALUES (?, ?, ?, ?, ?);
+
+insertExpenseWithParticipant:
+INSERT INTO ExpenseGroupExpenseParticipant(ege_id, ep_id, payer) VALUES (?, ?, ?);
+
+updateExpense:
+UPDATE ExpenseGroupExpense SET label=?, amount=? WHERE id=?;
+
+deleteExpenseWithParticipant:
+DELETE FROM ExpenseGroupExpenseParticipant WHERE ege_id=?;
+
+deleteExpense:
+DELETE FROM ExpenseGroupExpense WHERE id=?;

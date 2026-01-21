@@ -66,17 +66,20 @@ fun App() = AppTheme {
             }
             entry<Screens.Expense.Detail>(
                 metadata = ListDetailSceneStrategy.detailPane(sceneKey = Screens.Expense)
-            ) {
+            ) { entry ->
                 ExpenseDetailScreen(
-                    item = it.id,
+                    item = entry.id,
                     onBack = {
-                        backStack.remove(it)
+                        backStack.remove(entry)
                     },
                     onEdit = {
                         backStack.add(Screens.AddExpenseGroup(it))
                     },
                     onAddExpense = {
-                        backStack.add(Screens.AddExpense(it.id))
+                        backStack.add(Screens.AddExpense(entry.id))
+                    },
+                    onEditExpense = {
+                        backStack.add(Screens.AddExpense(entry.id, it))
                     }
                 )
             }
@@ -95,7 +98,8 @@ fun App() = AppTheme {
                     onBack = {
                         backStack.remove(it)
                     },
-                    itemId = it.itemId
+                    itemId = it.itemId,
+                    initial = it.initial
                 )
             }
         },

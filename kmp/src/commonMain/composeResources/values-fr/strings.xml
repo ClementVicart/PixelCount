@@ -17,4 +17,18 @@
     <string name="expenses">Dépenses</string>
     <string name="balance">Equilibre</string>
     <string name="add_expense">Ajouter une dépense</string>
+    <string name="owes_to">doit à</string>
+    <string name="no_balance_required">Pas d'équilibre à afficher</string>
+    <string name="type">Type</string>
+    <string name="payment">Paiement</string>
+    <string name="refund">Remboursement</string>
+    <string name="transfer">Transfert</string>
+    <string name="amount">Montant</string>
+    <string name="paid_by">Payé par</string>
+    <string name="to">A</string>
+    <string name="delete">Supprimer</string>
+    <string name="add">Ajouter</string>
+    <string name="modify">Modifier</string>
+    <string name="share_with">Partager avec</string>
+    <string name="amount_must_be_less_than_limit">Le montant doit être inférieur à %1$s</string>
 </resources>

@@ -7,6 +7,7 @@ import kotlin.uuid.Uuid
 @Serializable
 data class Expense(
     val id: Uuid = Uuid.random(),
+    val type: PaymentTypeEnum,
     val label: String,
     val amount: Double,
     val paidBy: Participant,

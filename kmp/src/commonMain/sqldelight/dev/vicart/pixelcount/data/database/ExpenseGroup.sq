@@ -1,11 +1,14 @@
 import kotlin.uuid.Uuid;
 import kotlin.Boolean;
 import kotlin.time.Instant;
+import java.util.Currency;
+import dev.vicart.pixelcount.model.PaymentTypeEnum;
 
 CREATE TABLE IF NOT EXISTS ExpenseGroup (
     id TEXT AS Uuid PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
-    emoji TEXT NOT NULL
+    emoji TEXT NOT NULL,
+    currency TEXT AS Currency NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ExpenseParticipant (
@@ -18,6 +21,7 @@ CREATE TABLE IF NOT EXISTS ExpenseParticipant (
 
 CREATE TABLE IF NOT EXISTS ExpenseGroupExpense (
     id TEXT AS Uuid PRIMARY KEY NOT NULL,
+    type TEXT AS PaymentTypeEnum NOT NULL,
     amount REAL NOT NULL,
     label TEXT NOT NULL,
     datetime INTEGER AS Instant NOT NULL

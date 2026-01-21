@@ -25,6 +25,8 @@ kotlin {
         androidResources {
             enable = true
         }
+
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     jvm {

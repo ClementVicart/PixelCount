@@ -1,6 +1,7 @@
 package dev.vicart.pixelcount.data.repository
 
 import dev.vicart.pixelcount.data.database.Database
+import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.ExpenseGroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,4 +24,16 @@ object ExpenseGroupRepository {
     fun getExpenseGroupFromId(id: Uuid) = dao.getExpenseGroupFromId(id)
 
     fun update(expenseGroup: ExpenseGroup) = dao.updateExpenseGroup(expenseGroup)
+
+    fun insertExpense(expense: Expense) {
+        dao.insertExpense(expense)
+    }
+
+    fun updateExpense(expense: Expense) {
+        dao.updateExpense(expense)
+    }
+
+    fun deleteExpense(expense: Expense) {
+        dao.deleteExpense(expense)
+    }
 }

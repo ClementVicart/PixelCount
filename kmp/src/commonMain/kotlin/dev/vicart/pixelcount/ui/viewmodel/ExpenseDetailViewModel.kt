@@ -23,17 +23,13 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         (it?.expenses
             ?.filter { it.paidBy.mandatory }
             ?.sumOf(Expense::amount) ?: 0.0)
-            .toBigDecimal()
-            .setScale(2, RoundingMode.HALF_UP)
     }
 
     val totalExpenses = expenseGroup.mapLatest {
         (it?.expenses
             ?.sumOf(Expense::amount) ?: 0.0)
-            .toBigDecimal()
-            .setScale(2, RoundingMode.HALF_UP)
     }
 
     val balances = expenseGroup.filterNotNull().mapLatest(::BalanceCalculatorService)
-        .mapLatest { withContext(Dispatchers.Default) { it.calculateBalance() } }
+        .mapLatest(BalanceCalculatorService::calculateBalance)
 }

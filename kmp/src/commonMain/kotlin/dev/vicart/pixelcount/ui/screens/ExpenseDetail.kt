@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,8 +19,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.AddCard
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -29,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.SecondaryTabRow
@@ -50,11 +55,16 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,20 +72,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
 import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.ExpenseGroup
+import dev.vicart.pixelcount.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.balance
 import dev.vicart.pixelcount.resources.created_by
 import dev.vicart.pixelcount.resources.expenses
 import dev.vicart.pixelcount.resources.my_expenses
+import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
+import dev.vicart.pixelcount.resources.owes_to
 import dev.vicart.pixelcount.resources.total_expenses
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
+import dev.vicart.pixelcount.util.prettyPrint
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
-import java.math.BigDecimal
+import kotlin.math.abs
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -85,7 +99,8 @@ fun ExpenseDetailScreen(
     vm: ExpenseDetailViewModel = viewModel(key = item.toString()) { ExpenseDetailViewModel(item) },
     onBack: () -> Unit,
     onEdit: (ExpenseGroup) -> Unit,
-    onAddExpense: () -> Unit
+    onAddExpense: () -> Unit,
+    onEditExpense: (Expense) -> Unit
 ) {
     val group by vm.expenseGroup.collectAsStateWithLifecycle()
 
@@ -117,7 +132,8 @@ fun ExpenseDetailScreen(
             sheetContent = {
                 DetailSheetContent(
                     vm = vm,
-                    group = group
+                    group = group,
+                    onExpenseClicked = onEditExpense
                 )
             },
             topBar = {
@@ -147,7 +163,7 @@ fun ExpenseDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = group?.emoji ?: "",
+                    text = group?.emoji.orEmpty(),
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(top = 16.dp)
                 )
@@ -160,14 +176,14 @@ fun ExpenseDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val myExpenses by vm.myExpenses.collectAsStateWithLifecycle(BigDecimal.ZERO)
+                        val myExpenses by vm.myExpenses.collectAsStateWithLifecycle(0.0)
                         Text(
                             text = stringResource(Res.string.my_expenses),
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
-                            text = "${myExpenses}€",
-                            style = MaterialTheme.typography.displayMedium,
+                            text = "${group?.let { myExpenses.prettyPrint(it.currency) }}",
+                            style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -176,14 +192,14 @@ fun ExpenseDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val totalExpenses by vm.totalExpenses.collectAsStateWithLifecycle(BigDecimal.ZERO)
+                        val totalExpenses by vm.totalExpenses.collectAsStateWithLifecycle(0.0)
                         Text(
                             text = stringResource(Res.string.total_expenses),
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
-                            text = "${totalExpenses}€",
-                            style = MaterialTheme.typography.displayMedium,
+                            text = "${group?.let { totalExpenses.prettyPrint(it.currency) }}",
+                            style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -225,7 +241,8 @@ private fun NewPaymentFab(
 @Composable
 private fun DetailSheetContent(
     vm: ExpenseDetailViewModel,
-    group: ExpenseGroup?
+    group: ExpenseGroup?,
+    onExpenseClicked: (Expense) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -258,47 +275,90 @@ private fun DetailSheetContent(
         ) {
             if(it == 0) {
                 ExpensesList(
-                    expenses = group?.expenses ?: emptyList()
+                    onExpenseClicked = onExpenseClicked,
+                    group = group
                 )
             } else {
-                BalanceList(vm = vm)
+                BalanceList(
+                    vm = vm,
+                    group = group
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BalanceList(
+    vm: ExpenseDetailViewModel,
+    group: ExpenseGroup?
+) {
+    val balances by vm.balances.collectAsStateWithLifecycle(emptyList())
+
+    if(balances.isEmpty() || group == null) {
+        EmptyContent(
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(stringResource(Res.string.no_balance_required)) }
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(balances) {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append("${it.from.name} ")
+                                }
+                                append(stringResource(Res.string.owes_to))
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(" ${it.to.name} ")
+                                }
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)) {
+                                    append(it.amount.prettyPrint(group.currency))
+                                }
+                            }
+                        )
+                    },
+                    modifier = Modifier.clip(MaterialTheme.shapes.small),
+                    trailingContent = {
+                        FilledTonalIconButton(
+                            onClick = {},
+                            shapes = IconButtonDefaults.shapes(),
+                            modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
+                                widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
+                            ))
+                        ) {
+                            Icon(Icons.Default.Check, null)
+                        }
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun BalanceList(
-    vm: ExpenseDetailViewModel
-) {
-    val balances by vm.balances.collectAsStateWithLifecycle(emptyList())
-
-    if(balances.isEmpty()) {
-        EmptyContent(
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(Res.string.balance)) }
-        )
-    } else {
-
-    }
-}
-
-@Composable
 private fun ExpensesList(
     modifier: Modifier = Modifier,
-    expenses: List<Expense>
+    group: ExpenseGroup?,
+    onExpenseClicked: (Expense) -> Unit
 ) {
-    if(expenses.isEmpty()) {
+    if(group?.expenses.isNullOrEmpty()) {
         EmptyContent(
             modifier = modifier.fillMaxWidth(),
             label = { Text(stringResource(Res.string.no_expense_yet)) }
         )
     } else {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val expensesGrouped = expenses.groupBy {
+            val expensesGrouped = group.expenses.groupBy {
                 it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.toList()
 
             items(expensesGrouped) {
@@ -306,13 +366,53 @@ private fun ExpensesList(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = it.first.toString(),
+                        text = it.first.prettyPrint,
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     it.second.forEach { expense ->
                         ListItem(
-                            headlineContent = { Text(expense.label) }
+                            headlineContent = {
+                                Text(
+                                    text = buildString {
+                                        if(expense.type == PaymentTypeEnum.PAYMENT) append("- ")
+                                        if(expense.type == PaymentTypeEnum.REFUND) append("+ ")
+                                        append(expense.amount.let(::abs).prettyPrint(group.currency))
+                                    },
+                                    color = when(expense.type) {
+                                        PaymentTypeEnum.PAYMENT -> MaterialTheme.colorScheme.error
+                                        PaymentTypeEnum.REFUND -> Color.Green
+                                        else -> LocalContentColor.current
+                                    }
+                                )
+                            },
+                            overlineContent = { Text(expense.label) },
+                            modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
+                                onExpenseClicked(expense)
+                            },
+                            supportingContent = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.tertiary
+                                    ) {
+                                        Text(expense.paidBy.name)
+                                    }
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowRightAlt,
+                                        contentDescription = null
+                                    )
+                                    expense.sharedWith.forEach { participant ->
+                                        Badge(
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                                        ) {
+                                            Text(participant.name)
+                                        }
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -331,9 +431,9 @@ private fun TopBar(
     onAddExpense: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(group?.title ?: "") },
+        title = { Text(group?.title.orEmpty()) },
         subtitle = { Text(stringResource(Res.string.created_by, group?.participants?.firstOrNull { it.mandatory }
-            ?.name ?: "")) },
+            ?.name.orEmpty())) },
         navigationIcon = {
             BackButton(onBack)
         },

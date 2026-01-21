@@ -6,6 +6,8 @@ import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.model.Participant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import java.util.Currency
+import java.util.Locale
 import kotlin.uuid.Uuid
 
 class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewModel() {
@@ -38,7 +40,8 @@ class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewMod
             participants = participants.value +
                     Participant(id = initialItem?.participants?.first { it.mandatory }?.id ?: Uuid.random(),
                         name = userName.value, mandatory = true),
-            expenses = emptyList()
+            expenses = emptyList(),
+            currency = Currency.getInstance(Locale.getDefault())
         )
         if(initialItem == null) {
             ExpenseGroupRepository.insert(expenseGroup)

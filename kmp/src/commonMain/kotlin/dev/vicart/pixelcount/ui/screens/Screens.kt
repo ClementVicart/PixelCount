@@ -20,5 +20,5 @@ object Screens {
     data class AddExpenseGroup(val item: ExpenseGroup? = null) : NavKey
 
     @Serializable
-    data class AddExpense(val itemId: Uuid) : NavKey
+    data class AddExpense(val itemId: Uuid, val initial: dev.vicart.pixelcount.model.Expense? = null) : NavKey
 }

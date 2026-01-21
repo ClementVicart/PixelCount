@@ -17,4 +17,18 @@
     <string name="expenses">Expenses</string>
     <string name="balance">Balance</string>
     <string name="add_expense">Add an expense</string>
+    <string name="owes_to">owes to</string>
+    <string name="no_balance_required">No balance required</string>
+    <string name="type">Type</string>
+    <string name="payment">Payment</string>
+    <string name="refund">Refund</string>
+    <string name="transfer">Transfer</string>
+    <string name="amount">Amount</string>
+    <string name="paid_by">Paid by</string>
+    <string name="to">To</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="modify">Modify</string>
+    <string name="share_with">Share with</string>
+    <string name="amount_must_be_less_than_limit">Amount must be less than %1$s</string>
 </resources>
