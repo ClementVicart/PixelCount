@@ -35,12 +35,13 @@ android {
     }
 
     signingConfigs {
-//        create("release") {
-//            storeFile = file(providers.gradleProperty("android.sign.storeFile").get())
-//            keyAlias = providers.gradleProperty("android.sign.alias").get()
-//            storePassword = providers.gradleProperty("android.sign.storePassword").get()
-//            keyPassword = providers.gradleProperty("android.sign.keyPassword").get()
-//        }
+        create("release") {
+            storeFile = file(providers.gradleProperty("android.storeFile").get())
+            storePassword = providers.gradleProperty("android.storePassword").get()
+            keyAlias = providers.gradleProperty("android.alias").get()
+            keyPassword = providers.gradleProperty("android.keyPassword").get()
+            storeType = "JKS"
+        }
     }
 
     buildTypes {
@@ -50,7 +51,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt")
             )
-            //signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
