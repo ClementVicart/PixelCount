@@ -1,42 +1,32 @@
-# Compose Multiplatform with Android project template
+# PixelCount
 
-This repository aims to serve as a template for Kotlin Multiplatform projects with Compose and Android application Support.
+PixelCount is a Kotlin Multiplatform application designed to help you track expenses and manage shared costs with groups of people. Whether you're planning a trip with friends or managing household expenses, PixelCount makes it easy to see who owes what.
 
-It uses latest versions of Compose Multiplatform and Android libraries, as well as **recommended project architecture**.
+## Summary
 
-> [!TIP]
-> This new project architecture uses a separate Android module. This will be the default architecture in AGP 9.0.0.
-> See more [here](https://kotlinlang.org/docs/multiplatform/whats-new-compose-110.html#support-for-agp-9-0-0)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
 
-## Project architecture
+## Screenshots
 
-This project uses the latest recommended architecture for Compose Multiplaform. It is splitted in two different Gradle modules:
-* **kmp**: contains the Compose Multiplatform plugin and hosts the shared source sets (JVM, Android...)
-* **androidApp**: contains the Android Application plugin and common configuration you could use on pure Android project. **It depends on the `kmp` module**
+<!-- Add screenshots here -->
 
-The `kmp` module also uses the new `com.android.kotlin.multiplatform.library` plugin that makes a bridge
-between the multiplatform source sets and the `androidApp`'s ones. This is the current recommendation from Google
-and Jetbrains for new Kotlin Multiplatform projects
+## Features
 
-```
-:androidApp -> Pure Android configurations and source sets
-|
-| Depends on
-v
-:kmp -> Common shared configurations and source sets
-```
+- 📁 **Expense Groups**: Organize your expenses into groups (e.g., "Ski Vacations", "Housemates").
+- 👥 **Participant Management**: Add participants to each group to track individual contributions.
+- 💸 **Expense Tracking**: Record payments, refunds, and transfers within a group.
+- 🤝 **Shared Expenses**: Easily split expenses among multiple participants.
+- ⚖️ **Automatic Balance Calculation**: Instantly see the debt status between participants.
+- 😊 **Emoji Support**: Customize your expense groups with fun emojis.
+- 📱 **Multi-platform**: Available on Android and Desktop (JVM).
 
-## How to use
+## Technology Stack
 
-Clone this repository and rename it as you want. Then, edit the following files:
-* `settings.gradle.kts`
-  * Change the project name in `rootProject.name`
-* `kmp/build.gradle.kts`
-  * Change the namespace in the `androidLibrary` block
-  * Change the package of the generated resources in the `compose.resources` block
-  * Change the main class of the JVM platform in the `compose.desktop` block
-* `androidApp/build.gradle.kts`
-  * Change the namespace
-  * Change the applicationId
-* `gradle/libs.versions.toml`
-  * Edit the android SDK min/compile versions following your needs
+- **[Kotlin Multiplatform (KMP)](https://kotlinlang.org/docs/multiplatform.html)**: Shared business logic across platforms.
+- **[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)**: Declarative UI for both Android and Desktop.
+- **[SQLDelight](https://cashapp.github.io/sqldelight/)**: Type-safe database for local storage.
+- **[Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization)**: For JSON processing.
+- **[Kotlinx DateTime](https://github.com/Kotlin/kotlinx-datetime)**: For handling dates and times.
+- **Material 3**: Modern UI components and styling.

@@ -31,7 +31,7 @@ kotlin {
 
     jvm {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_25 // Current LTS
+            jvmTarget = JvmTarget.JVM_25
         }
     }
 
@@ -80,6 +80,13 @@ compose.resources {
 compose.desktop {
     application {
         mainClass = "dev.vicart.pixelcount.MainKt"
+        buildTypes {
+            release {
+                proguard {
+                    isEnabled = false
+                }
+            }
+        }
     }
 }
 
