@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="expense_groups">Groupes de dépenses</string>
+    <string name="expense_groups">Groupes</string>
     <string name="no_expense_yet">Pas de dépense pour le moment</string>
-    <string name="add_expense_group">Ajouter un groupe de dépense</string>
+    <string name="add_expense_group">Ajouter un groupe</string>
     <string name="title">Titre</string>
     <string name="ski_vacations">Vacances au ski</string>
     <string name="participants">Participants</string>
@@ -31,4 +31,7 @@
     <string name="modify">Modifier</string>
     <string name="share_with">Partager avec</string>
     <string name="amount_must_be_less_than_limit">Le montant doit être inférieur à %1$s</string>
+    <string name="delete_group_expense">Confirmer la suppression de ce groupe</string>
+    <string name="delete_group_expense_info">Cela va supprimer ce groupe et est irréversible</string>
+    <string name="cancel">Annuler</string>
 </resources>

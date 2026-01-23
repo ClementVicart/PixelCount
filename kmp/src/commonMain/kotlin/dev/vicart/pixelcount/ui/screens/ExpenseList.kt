@@ -1,7 +1,9 @@
 package dev.vicart.pixelcount.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +12,10 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -17,10 +23,14 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
@@ -31,8 +41,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
+import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expense_groups
+import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.no_expense_yet
+import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseListViewModel
 import org.jetbrains.compose.resources.stringResource
@@ -44,7 +57,8 @@ fun ExpenseListScreen(
     vm: ExpenseListViewModel = viewModel { ExpenseListViewModel() },
     addExpenseGroup: () -> Unit,
     selectedItem: Uuid? = null,
-    selectItem: (Uuid) -> Unit
+    selectItem: (Uuid) -> Unit,
+    onEdit: (ExpenseGroup) -> Unit
 ) {
     Scaffold(
         floatingActionButton = { AddExpenseGroupFab(onClick = addExpenseGroup) }
@@ -75,23 +89,55 @@ fun ExpenseListScreen(
                 }
             } else {
                 items(expenses) {
-                    ListItem(
-                        headlineContent = { Text(it.title) },
-                        leadingContent = {
-                            Text(
-                                text = it.emoji,
-                                fontSize = with(LocalDensity.current) {
-                                    IconButtonDefaults.smallIconSize.toSp()
-                                }
-                            )
-                        },
-                        tonalElevation = if(selectedItem == it.id) 4.dp else 1.dp,
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.medium)
-                            .selectable(selected = selectedItem == it.id) {
-                                selectItem(it.id)
+                    Box {
+                        var menuExpanded by remember { mutableStateOf(false) }
+                        ListItem(
+                            headlineContent = { Text(it.title) },
+                            leadingContent = {
+                                Text(
+                                    text = it.emoji,
+                                    fontSize = with(LocalDensity.current) {
+                                        IconButtonDefaults.smallIconSize.toSp()
+                                    }
+                                )
                             },
-                    )
+                            tonalElevation = if(selectedItem == it.id) 4.dp else 1.dp,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.medium)
+                                .combinedClickable(
+                                    onLongClick = { menuExpanded = true },
+                                    onClick = { selectItem(it.id) }
+                                ),
+                        )
+
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.modify)) },
+                                onClick = { onEdit(it) },
+                                leadingIcon = { Icon(Icons.Default.Edit, null) }
+                            )
+
+                            var deleteDialogVisible by remember { mutableStateOf(false) }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.delete)) },
+                                onClick = { deleteDialogVisible = true },
+                                leadingIcon = { Icon(Icons.Default.Delete, null) },
+                                colors = MenuDefaults.itemColors().copy(
+                                    textColor = MaterialTheme.colorScheme.error,
+                                    leadingIconColor = MaterialTheme.colorScheme.error
+                                )
+                            )
+
+                            ConfirmDeleteGroupExpenseDialog(
+                                isVisible = deleteDialogVisible,
+                                onDismiss = { deleteDialogVisible = false },
+                                onConfirm = { vm.deleteExpenseGroup(it) }
+                            )
+                        }
+                    }
                 }
             }
         }

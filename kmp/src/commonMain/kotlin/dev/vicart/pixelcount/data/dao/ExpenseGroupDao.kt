@@ -11,6 +11,7 @@ import dev.vicart.pixelcount.model.Participant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
+import kotlin.math.exp
 import kotlin.uuid.Uuid
 
 private val selectAllMapper = { lst: List<SelectAll> ->
@@ -108,7 +109,7 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
         .asFlow()
         .mapToList(Dispatchers.IO)
         .mapLatest(selectWhereIdMapper)
-        .mapLatest { it.first() }
+        .mapLatest { it.firstOrNull() }
 
     fun updateExpenseGroup(group: ExpenseGroup) {
         queries.transaction {
@@ -148,6 +149,20 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
         queries.transaction {
             queries.deleteExpenseWithParticipant(expense.id)
             queries.deleteExpense(expense.id)
+        }
+    }
+
+    fun deleteParticipant(participant: Participant) {
+        queries.transaction {
+            queries.deleteParticipant(participant.id)
+        }
+    }
+
+    fun deleteExpenseGroup(expenseGroup: ExpenseGroup) {
+        queries.transaction {
+            expenseGroup.expenses.forEach(::deleteExpense)
+            expenseGroup.participants.forEach(::deleteParticipant)
+            queries.deleteExpenseGroup(expenseGroup.id)
         }
     }
 }

@@ -20,7 +20,7 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
 
     val sharedWith = MutableStateFlow(initial?.sharedWith)
 
-    val paymentType = MutableStateFlow(PaymentTypeEnum.PAYMENT)
+    val paymentType = MutableStateFlow(initial?.type ?: PaymentTypeEnum.PAYMENT)
 
     val paidBy = MutableStateFlow(initial?.paidBy)
 
@@ -41,13 +41,13 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
     val expenseGroup = ExpenseGroupRepository.getExpenseGroupFromId(itemId)
         .onEach {
             if(paidBy.value == null) {
-                paidBy.value = it.participants.single { it.mandatory }
+                paidBy.value = it?.participants?.single { it.mandatory }
             }
             if(sharedWith.value == null) {
-                sharedWith.value = it.participants.filterNot { paidBy.value == it }
+                sharedWith.value = it?.participants?.filterNot { paidBy.value == it }
             }
             if(transferTo.value == null) {
-                transferTo.value = it.participants.filterNot { paidBy.value == it }.firstOrNull()
+                transferTo.value = it?.participants?.filterNot { paidBy.value == it }?.firstOrNull()
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)

@@ -61,6 +61,9 @@ fun App() = AppTheme {
                     },
                     selectedItem = backStack.findLast { it is Screens.Expense.Detail }?.let {
                         (it as Screens.Expense.Detail).id
+                    },
+                    onEdit = {
+                        backStack.add(Screens.AddExpenseGroup(it))
                     }
                 )
             }

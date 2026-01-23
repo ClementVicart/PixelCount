@@ -36,4 +36,8 @@ object ExpenseGroupRepository {
     fun deleteExpense(expense: Expense) {
         dao.deleteExpense(expense)
     }
+
+    fun deleteExpenseGroup(expenseGroup: ExpenseGroup) {
+        dao.deleteExpenseGroup(expenseGroup)
+    }
 }

@@ -22,9 +22,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
@@ -35,6 +39,7 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -76,13 +81,16 @@ import dev.vicart.pixelcount.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.balance
 import dev.vicart.pixelcount.resources.created_by
+import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expenses
 import dev.vicart.pixelcount.resources.my_expenses
 import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
 import dev.vicart.pixelcount.resources.owes_to
 import dev.vicart.pixelcount.resources.total_expenses
+import dev.vicart.pixelcount.resources.transfer
 import dev.vicart.pixelcount.ui.components.BackButton
+import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
@@ -142,7 +150,11 @@ fun ExpenseDetailScreen(
                     onBack = onBack,
                     onEdit = { onEdit(group!!) },
                     shouldShowToolbar = shouldShowToolbar,
-                    onAddExpense = onAddExpense
+                    onAddExpense = onAddExpense,
+                    onDeleteExpenseGroup = {
+                        vm.deleteExpenseGroup()
+                        onBack()
+                    }
                 )
             },
             sheetPeekHeight = max(sheetPeekHeight - 16.dp, 0.dp),
@@ -182,7 +194,7 @@ fun ExpenseDetailScreen(
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
-                            text = "${group?.let { myExpenses.prettyPrint(it.currency) }}",
+                            text = group?.let { myExpenses.prettyPrint(it.currency) }.orEmpty(),
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary
@@ -198,7 +210,7 @@ fun ExpenseDetailScreen(
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
-                            text = "${group?.let { totalExpenses.prettyPrint(it.currency) }}",
+                            text = group?.let { totalExpenses.prettyPrint(it.currency) }.orEmpty(),
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary
@@ -276,7 +288,8 @@ private fun DetailSheetContent(
             if(it == 0) {
                 ExpensesList(
                     onExpenseClicked = onExpenseClicked,
-                    group = group
+                    group = group,
+                    vm = vm
                 )
             } else {
                 BalanceList(
@@ -327,7 +340,7 @@ private fun BalanceList(
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     trailingContent = {
                         FilledTonalIconButton(
-                            onClick = {},
+                            onClick = { vm.completeTransfer(it) },
                             shapes = IconButtonDefaults.shapes(),
                             modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
                                 widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
@@ -346,6 +359,7 @@ private fun BalanceList(
 private fun ExpensesList(
     modifier: Modifier = Modifier,
     group: ExpenseGroup?,
+    vm: ExpenseDetailViewModel,
     onExpenseClicked: (Expense) -> Unit
 ) {
     if(group?.expenses.isNullOrEmpty()) {
@@ -354,14 +368,14 @@ private fun ExpensesList(
             label = { Text(stringResource(Res.string.no_expense_yet)) }
         )
     } else {
+        val expensesGrouped by vm.expenses.collectAsStateWithLifecycle(emptyMap())
+
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val expensesGrouped = group.expenses.groupBy {
-                it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.toList()
 
-            items(expensesGrouped) {
+            items(expensesGrouped.toList()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -386,7 +400,14 @@ private fun ExpensesList(
                                     }
                                 )
                             },
-                            overlineContent = { Text(expense.label) },
+                            overlineContent = {
+                                Text(
+                                    text = if(expense.type == PaymentTypeEnum.TRANSFER)
+                                        stringResource(Res.string.transfer)
+                                    else
+                                        expense.label
+                                )
+                            },
                             modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
                                 onExpenseClicked(expense)
                             },
@@ -428,7 +449,8 @@ private fun TopBar(
     onBack: () -> Unit,
     onEdit: () -> Unit,
     shouldShowToolbar: Boolean,
-    onAddExpense: () -> Unit
+    onAddExpense: () -> Unit,
+    onDeleteExpenseGroup: () -> Unit
 ) {
     TopAppBar(
         title = { Text(group?.title.orEmpty()) },
@@ -454,6 +476,45 @@ private fun TopBar(
                 )
             ) {
                 Icon(Icons.Default.Edit, null)
+            }
+
+            Box {
+                var menuExpanded by remember { mutableStateOf(false) }
+                FilledTonalIconButton(
+                    onClick = { menuExpanded = true },
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallPressedShape
+                    ),
+                    modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
+                        widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
+                    ))
+                ) {
+                    Icon(Icons.Default.MoreVert, null)
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    var deleteDialogVisible by remember { mutableStateOf(false) }
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.delete)) },
+                        leadingIcon = { Icon(Icons.Default.Delete, null) },
+                        onClick = { deleteDialogVisible = true },
+                        colors = MenuDefaults.itemColors().copy(
+                            textColor = MaterialTheme.colorScheme.error,
+                            leadingIconColor = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                    ConfirmDeleteGroupExpenseDialog(
+                        isVisible = deleteDialogVisible,
+                        onDismiss = { deleteDialogVisible = false },
+                        onConfirm = onDeleteExpenseGroup
+                    )
+                }
             }
         }
     )

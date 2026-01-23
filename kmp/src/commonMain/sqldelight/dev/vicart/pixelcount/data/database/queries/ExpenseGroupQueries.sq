@@ -39,3 +39,9 @@ DELETE FROM ExpenseGroupExpenseParticipant WHERE ege_id=?;
 
 deleteExpense:
 DELETE FROM ExpenseGroupExpense WHERE id=?;
+
+deleteParticipant:
+DELETE FROM ExpenseParticipant WHERE id=?;
+
+deleteExpenseGroup:
+DELETE FROM ExpenseGroup WHERE id=?;

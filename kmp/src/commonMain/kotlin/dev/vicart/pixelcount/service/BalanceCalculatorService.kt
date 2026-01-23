@@ -18,6 +18,11 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
             }.fold(mutableMapOf<Participant, Double>()) { acc, pair ->
                 acc[pair.first] = acc.getOrPut(pair.first) { 0.0 } + pair.second
                 acc
+            }.mapValues { (debitor, amount) ->
+                val transfers = expenseGroup.expenses
+                    .filter { it.type == PaymentTypeEnum.TRANSFER && it.paidBy == debitor && it.sharedWith.contains(entry.key) }
+
+                amount - transfers.sumOf { it.amount }
             }
         }
 
@@ -45,7 +50,13 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
                     diff < 0 -> finalBalances.add(Balance(reciprocal.from, reciprocal.to, -diff))
                 }
             } else {
-                if(balance.amount != 0.0) finalBalances.add(balance)
+                if(balance.amount > 0.0) {
+                    finalBalances.add(balance)
+                } else if(balance.amount < 0.0) {
+                    balance.also {
+                        finalBalances.add(Balance(it.to, it.from, -it.amount))
+                    }
+                }
             }
         }
 
