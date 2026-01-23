@@ -87,6 +87,7 @@ import dev.vicart.pixelcount.resources.my_expenses
 import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
 import dev.vicart.pixelcount.resources.owes_to
+import dev.vicart.pixelcount.resources.select_or_create_a_group
 import dev.vicart.pixelcount.resources.total_expenses
 import dev.vicart.pixelcount.resources.transfer
 import dev.vicart.pixelcount.ui.components.BackButton
@@ -517,5 +518,13 @@ private fun TopBar(
                 }
             }
         }
+    )
+}
+
+@Composable
+fun UnselectedExpenseGroupDetail() {
+    EmptyContent(
+        modifier = Modifier.fillMaxSize(),
+        label = { Text(stringResource(Res.string.select_or_create_a_group)) }
     )
 }

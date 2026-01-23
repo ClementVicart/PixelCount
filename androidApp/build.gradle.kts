@@ -21,8 +21,8 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         applicationId = "dev.vicart.pixelcount"
-        versionName = "1.0.0"
-        versionCode = 1
+        versionName = providers.gradleProperty("app.version").get()
+        versionCode = providers.gradleProperty("app.versionCode").get().toInt()
     }
 
     buildFeatures {

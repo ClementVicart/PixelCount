@@ -28,7 +28,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
     val expenses = expenseGroup.filterNotNull().mapLatest { it.expenses }
         .mapLatest {
             it.groupBy { it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.mapValues {
-                it.value.sortedBy { it.datetime }
+                it.value.sortedByDescending { it.datetime }
             }
         }
 

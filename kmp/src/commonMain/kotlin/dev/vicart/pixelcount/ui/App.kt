@@ -16,6 +16,7 @@ import dev.vicart.pixelcount.ui.screens.AddExpenseScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseDetailScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseListScreen
 import dev.vicart.pixelcount.ui.screens.Screens
+import dev.vicart.pixelcount.ui.screens.UnselectedExpenseGroupDetail
 import dev.vicart.pixelcount.ui.theme.AppTheme
 import dev.vicart.pixelcount.ui.transition.TransitionAxis
 import dev.vicart.pixelcount.ui.transition.rememberMaterialTransition
@@ -50,7 +51,9 @@ fun App() = AppTheme {
         backStack = backStack,
         entryProvider = entryProvider {
             entry<Screens.Expense.List>(
-                metadata = ListDetailSceneStrategy.listPane(sceneKey = Screens.Expense)
+                metadata = ListDetailSceneStrategy.listPane(sceneKey = Screens.Expense) {
+                    UnselectedExpenseGroupDetail()
+                }
             ) {
                 ExpenseListScreen(
                     addExpenseGroup = {
