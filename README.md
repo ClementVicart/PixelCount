@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://github.com/ClementVicart/PixelCount/blob/main/kmp/assets/icon-192.png?raw=true" alt="PixelCount Logo"/>
+</p>
+
 # PixelCount
 
 PixelCount is a Kotlin Multiplatform application designed to help you track and split expenses between groups of friends or colleagues. Whether you're on a ski vacation or sharing a dinner, PixelCount makes it easy to manage who owes what.
