@@ -20,10 +20,12 @@ PixelCount is a Kotlin Multiplatform application designed to help you track and 
 
 ## 📷 Screenshots
 
-![Screenshot1](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221927.png?raw=true)
-![Screenshot2](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221936.png?raw=true)
-![Screenshot3](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221942.png?raw=true)
-![Screenshot4](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221947.png?raw=true)
+<p align="center">
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221927.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221936.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221942.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221947.png?raw=true" width="150"/>
+</p>
 
 ## 🚀 Platforms
 
