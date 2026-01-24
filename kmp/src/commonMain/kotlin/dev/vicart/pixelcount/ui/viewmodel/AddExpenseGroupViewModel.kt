@@ -1,11 +1,16 @@
 package dev.vicart.pixelcount.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.vicart.pixelcount.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.model.Participant
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import java.util.Currency
 import java.util.Locale
 import kotlin.uuid.Uuid
@@ -24,6 +29,12 @@ class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewMod
         title.isNotBlank() && userName.isNotBlank() && participants.all { it.name.isNotBlank() }
     }
 
+    val currency = MutableStateFlow(initialItem?.currency ?: Currency.getInstance(Locale.getDefault()))
+
+    val availableCurrencies = flowOf(Currency.getAvailableCurrencies().toList())
+        .mapLatest { it.sortedBy { it.displayName } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
     fun addParticipant(name: String) {
         participants.value += listOf(Participant(name = name))
     }
@@ -41,7 +52,7 @@ class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewMod
                     Participant(id = initialItem?.participants?.first { it.mandatory }?.id ?: Uuid.random(),
                         name = userName.value, mandatory = true),
             expenses = emptyList(),
-            currency = Currency.getInstance(Locale.getDefault())
+            currency = currency.value
         )
         if(initialItem == null) {
             ExpenseGroupRepository.insert(expenseGroup)
