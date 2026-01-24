@@ -47,6 +47,7 @@ import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
 import dev.vicart.pixelcount.resources.john_doe
+import dev.vicart.pixelcount.resources.options
 import dev.vicart.pixelcount.resources.participant_name
 import dev.vicart.pixelcount.resources.participants
 import dev.vicart.pixelcount.resources.ski_vacations
@@ -188,7 +189,7 @@ fun AddExpenseGroupScreen(
             }
 
             Text(
-                text = "Options",
+                text = stringResource(Res.string.options),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
