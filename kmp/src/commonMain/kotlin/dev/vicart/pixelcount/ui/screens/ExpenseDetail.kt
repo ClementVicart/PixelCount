@@ -52,16 +52,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
@@ -95,8 +91,6 @@ import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 import kotlin.uuid.Uuid
@@ -127,12 +121,6 @@ fun ExpenseDetailScreen(
     }
 
     val bottomSheetState = rememberStandardBottomSheetState()
-
-    val bottomSheetOffset by produceState(1f, bottomSheetState, sheetPeekHeight) {
-        snapshotFlow { bottomSheetState.requireOffset() }.collect {
-            value = (it / (sheetPeekHeight.value + 16.dp.value)).coerceIn(0f, 1f)
-        }
-    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -169,9 +157,7 @@ fun ExpenseDetailScreen(
                     .padding(it)
                     .onGloballyPositioned {
                         contentHeight = with(density) { it.positionInWindow().y.toDp() + it.size.height.toDp() }
-                    }
-                    .alpha(bottomSheetOffset)
-                    .scale(bottomSheetOffset),
+                    },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
