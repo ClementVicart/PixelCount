@@ -18,6 +18,13 @@ PixelCount is a Kotlin Multiplatform application designed to help you track and 
 - **Emoji Customization**: Personalize your expense groups with a built-in emoji picker.
 - **Multi-language Support**: Available in English and French.
 
+## 📷 Screenshots
+
+![Screenshot1](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221927.png?raw=true)
+![Screenshot2](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221936.png?raw=true)
+![Screenshot3](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221942.png?raw=true)
+![Screenshot4](https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221947.png?raw=true)
+
 ## 🚀 Platforms
 
 PixelCount is built using **Kotlin Multiplatform** and **Compose Multiplatform**, currently supporting:
