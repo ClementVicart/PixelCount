@@ -8,6 +8,7 @@ import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.model.PaymentTypeEnum
 import dev.vicart.pixelcount.platform.deleteImage
+import dev.vicart.pixelcount.platform.hasImage
 import dev.vicart.pixelcount.service.BalanceCalculatorService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,6 +50,10 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
 
     val balances = expenseGroup.filterNotNull().mapLatest(::BalanceCalculatorService)
         .mapLatest(BalanceCalculatorService::calculateBalance)
+
+    val availableExpenseImage = expenses.mapLatest {
+        it.flatMap { it.value }.filter { hasImage(it.id) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun deleteExpenseGroup() {
         ExpenseGroupRepository.deleteExpenseGroup(expenseGroup.value!!)

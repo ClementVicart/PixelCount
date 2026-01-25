@@ -11,6 +11,8 @@ interface ContentProviderFactory {
     suspend fun writeImage(id: Uuid, data: ByteArray)
 
     suspend fun deleteImage(id: Uuid)
+
+    suspend fun hasImage(id: Uuid) : Boolean
 }
 
 lateinit var contentProviderFactory: ContentProviderFactory
@@ -20,3 +22,5 @@ actual suspend fun readImage(id: Uuid): ByteArray? = contentProviderFactory.read
 actual suspend fun writeImage(id: Uuid, data: ByteArray) = contentProviderFactory.writeImage(id, data)
 
 actual suspend fun deleteImage(id: Uuid) = contentProviderFactory.deleteImage(id)
+
+actual suspend fun hasImage(id: Uuid): Boolean = contentProviderFactory.hasImage(id)

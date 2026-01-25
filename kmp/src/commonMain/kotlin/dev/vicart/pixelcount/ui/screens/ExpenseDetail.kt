@@ -20,11 +20,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Compare
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.DropdownMenu
@@ -271,7 +277,8 @@ private fun DetailSheetContent(
                 (fadeIn(MotionScheme.expressive().defaultEffectsSpec()) + scaleIn(MotionScheme.expressive().defaultSpatialSpec()))
                     .togetherWith(fadeOut(MotionScheme.expressive().defaultEffectsSpec()) + scaleOut(
                         MotionScheme.expressive().defaultSpatialSpec()))
-            }
+            },
+            modifier = Modifier.padding(bottom = 96.dp)
         ) {
             if(it == 0) {
                 ExpensesList(
@@ -361,6 +368,8 @@ private fun ExpensesList(
     } else {
         val expensesGrouped by vm.expenses.collectAsStateWithLifecycle(emptyMap())
 
+        val expansesContainingImage by vm.availableExpenseImage.collectAsStateWithLifecycle()
+
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -424,6 +433,19 @@ private fun ExpensesList(
                                         }
                                     }
                                 }
+                            },
+                            trailingContent = (@Composable {
+                                Icon(Icons.Default.Image, null)
+                            }).takeIf { expansesContainingImage.contains(expense) },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = when(expense.type) {
+                                        PaymentTypeEnum.PAYMENT -> Icons.Default.CreditCard
+                                        PaymentTypeEnum.REFUND -> Icons.Default.Payments
+                                        PaymentTypeEnum.TRANSFER -> Icons.AutoMirrored.Default.CompareArrows
+                                    },
+                                    contentDescription = null
+                                )
                             }
                         )
                     }

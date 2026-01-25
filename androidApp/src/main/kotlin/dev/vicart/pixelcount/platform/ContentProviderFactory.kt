@@ -47,4 +47,9 @@ private class ContentProviderFactoryImpl(private val activity: ComponentActivity
         Unit
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun hasImage(id: Uuid): Boolean = withContext(Dispatchers.IO) {
+        File(activity.cacheDir, id.toString()).exists()
+    }
+
 }
