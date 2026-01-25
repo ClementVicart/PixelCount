@@ -1,12 +1,12 @@
 package dev.vicart.pixelcount.platform
 
 import dev.vicart.pixelcount.topWindow
+import dev.vicart.pixelcount.util.cacheDirectory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
-import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.uuid.Uuid
 
@@ -27,25 +27,18 @@ actual suspend fun pickImage(): ByteArray? {
 }
 
 actual suspend fun readImage(id: Uuid): ByteArray? = withContext(Dispatchers.IO) {
-    File(cacheDir.absolutePathString(), id.toString()).takeIf { it.exists() }?.readBytes()
+    File(cacheDirectory.absolutePathString(), id.toString()).takeIf { it.exists() }?.readBytes()
 }
 
 actual suspend fun writeImage(id: Uuid, data: ByteArray) = withContext(Dispatchers.IO) {
-    File(cacheDir.absolutePathString(), id.toString()).writeBytes(data)
-}
-
-private val cacheDir = System.getProperty("os.name").lowercase().let {
-    when {
-        it.startsWith("linux") -> Path(System.getProperty("user.home"), ".cache", "pixelcount")
-        else -> throw RuntimeException("Host not supported")
-    }
+    File(cacheDirectory.absolutePathString(), id.toString()).writeBytes(data)
 }
 
 actual suspend fun deleteImage(id: Uuid) = withContext(Dispatchers.IO) {
-    File(cacheDir.absolutePathString(), id.toString()).takeIf { it.exists() }?.delete()
+    File(cacheDirectory.absolutePathString(), id.toString()).takeIf { it.exists() }?.delete()
     Unit
 }
 
 actual suspend fun hasImage(id: Uuid): Boolean = withContext(Dispatchers.IO) {
-    File(cacheDir.absolutePathString(), id.toString()).exists()
+    File(cacheDirectory.absolutePathString(), id.toString()).exists()
 }
