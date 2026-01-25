@@ -7,12 +7,14 @@ import dev.vicart.pixelcount.model.Balance
 import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.model.PaymentTypeEnum
+import dev.vicart.pixelcount.platform.deleteImage
 import dev.vicart.pixelcount.service.BalanceCalculatorService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -50,6 +52,11 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
 
     fun deleteExpenseGroup() {
         ExpenseGroupRepository.deleteExpenseGroup(expenseGroup.value!!)
+        expenseGroup.value!!.expenses.forEach {
+            viewModelScope.launch {
+                deleteImage(it.id)
+            }
+        }
     }
 
     fun completeTransfer(balance: Balance) {

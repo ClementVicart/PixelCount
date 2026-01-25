@@ -10,7 +10,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,10 +31,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.outlined.CompareArrows
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Button
@@ -42,7 +48,10 @@ import androidx.compose.material3.ButtonGroupMenuState
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -73,12 +82,14 @@ import dev.vicart.pixelcount.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add
 import dev.vicart.pixelcount.resources.add_expense
+import dev.vicart.pixelcount.resources.add_photo
 import dev.vicart.pixelcount.resources.amount
 import dev.vicart.pixelcount.resources.amount_must_be_less_than_limit
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.paid_by
 import dev.vicart.pixelcount.resources.payment
+import dev.vicart.pixelcount.resources.picture
 import dev.vicart.pixelcount.resources.refund
 import dev.vicart.pixelcount.resources.share_with
 import dev.vicart.pixelcount.resources.title
@@ -293,6 +304,62 @@ fun AddExpenseScreen(
                             participants = group?.participants?.filterNot { it == paidBy }.orEmpty(),
                             selectedParticipant = transferTo,
                             onParticipantSelected = { vm.transferTo.value = it }
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = stringResource(Res.string.picture),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+
+            val pictureBitmap by vm.pictureBitmap.collectAsStateWithLifecycle(null)
+
+            if(pictureBitmap == null) {
+                OutlinedButton(
+                    onClick = vm::launchPickImage,
+                    shapes = ButtonDefaults.shapes(
+                        shape = ButtonDefaults.squareShape,
+                        pressedShape = ButtonDefaults.largePressedShape
+                    ),
+                    modifier = Modifier.height(ButtonDefaults.LargeContainerHeight).fillMaxWidth(),
+                    contentPadding = ButtonDefaults.LargeContentPadding
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.LargeIconSize)
+                    )
+                    Spacer(modifier = Modifier.width(ButtonDefaults.LargeIconSpacing))
+                    Text(stringResource(Res.string.add_photo))
+                }
+            } else {
+                Box {
+                    Image(
+                        bitmap = pictureBitmap!!,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            vm.launchPickImage()
+                        }
+                    )
+
+                    FilledTonalIconButton(
+                        onClick = { vm.removePicture() },
+                        shapes = IconButtonDefaults.shapes(
+                            shape = IconButtonDefaults.extraSmallRoundShape,
+                            pressedShape = IconButtonDefaults.extraSmallPressedShape
+                        ),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .size(IconButtonDefaults.extraSmallContainerSize())
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(IconButtonDefaults.extraSmallIconSize)
                         )
                     }
                 }

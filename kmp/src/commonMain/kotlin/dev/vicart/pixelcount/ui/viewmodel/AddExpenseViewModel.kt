@@ -6,13 +6,25 @@ import dev.vicart.pixelcount.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.Participant
 import dev.vicart.pixelcount.model.PaymentTypeEnum
+import dev.vicart.pixelcount.platform.deleteImage
+import dev.vicart.pixelcount.platform.pickImage
+import dev.vicart.pixelcount.platform.readImage
+import dev.vicart.pixelcount.platform.writeImage
 import dev.vicart.pixelcount.util.prettyPrint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlin.math.exp
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.decodeToImageBitmap
+import java.lang.Exception
 import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
@@ -29,6 +41,18 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
     val amount = MutableStateFlow(initial?.amount?.prettyPrint ?: "")
 
     val transferTo = MutableStateFlow(initial?.sharedWith?.firstOrNull())
+
+    val tempPicture = MutableStateFlow<ByteArray?>(null)
+
+    val pictureBitmap = tempPicture.mapLatest {
+        it ?: initial?.id?.let { readImage(it) }
+    }.mapLatest {
+        try {
+            it?.decodeToImageBitmap()
+        } catch (e: Exception) {
+            null
+        }
+    }.flowOn(Dispatchers.Default)
 
     val canAdd = combine(paymentType, title, amount, transferTo) { paymentType, title, amount, transferTo ->
         if(paymentType == PaymentTypeEnum.PAYMENT || paymentType == PaymentTypeEnum.REFUND)
@@ -66,8 +90,9 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
     }
 
     fun addExpense() {
+        val id = initial?.id ?: Uuid.random()
         val expense = Expense(
-            id = initial?.id ?: Uuid.random(),
+            id = id,
             label = title.value,
             amount = amount.value.toDouble().let {
                 when(paymentType.value) {
@@ -81,14 +106,40 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
             datetime = Clock.System.now(),
             type = paymentType.value
         )
-        if(initial == null) {
-            ExpenseGroupRepository.insertExpense(expense)
-        } else {
-            ExpenseGroupRepository.updateExpense(expense)
+        viewModelScope.launch {
+            tempPicture.value?.let {
+                if(it.isNotEmpty()) {
+                    writeImage(id, it)
+                } else {
+                    deleteImage(id)
+                }
+            }
+        }.invokeOnCompletion {
+            if(initial == null) {
+                ExpenseGroupRepository.insertExpense(expense)
+            } else {
+                ExpenseGroupRepository.updateExpense(expense)
+            }
         }
     }
 
     fun deleteExpense() {
         ExpenseGroupRepository.deleteExpense(initial!!)
+        viewModelScope.launch {
+            deleteImage(initial.id)
+        }
+    }
+
+    fun launchPickImage() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val imageBytes = pickImage()
+            if(imageBytes != null) {
+                tempPicture.value = imageBytes
+            }
+        }
+    }
+
+    fun removePicture() {
+        tempPicture.value = byteArrayOf()
     }
 }

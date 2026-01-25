@@ -31,6 +31,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -326,12 +327,15 @@ private fun BalanceList(
                     },
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     trailingContent = {
-                        FilledTonalIconButton(
+                        FilledIconButton(
                             onClick = { vm.completeTransfer(it) },
                             shapes = IconButtonDefaults.shapes(),
                             modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
                                 widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
-                            ))
+                            )),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
                         ) {
                             Icon(Icons.Default.Check, null)
                         }

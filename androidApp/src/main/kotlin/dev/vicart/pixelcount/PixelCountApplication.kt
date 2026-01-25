@@ -1,6 +1,7 @@
 package dev.vicart.pixelcount
 
 import android.app.Application
+import android.content.Context
 import dev.vicart.pixelcount.data.database.Database
 import dev.vicart.pixelcount.data.database.DriverFactory
 import dev.vicart.pixelcount.data.database.createDatabase
