@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: pixelcount-${{ matrix.os }}
-          path: kmp/build/compose/jars/pixelcount-*-release.jar
+          path: kmp/build/compose/jars/PixelCount-*-release.jar
 
   build-android-bundle:
     name: Build Android Bundle

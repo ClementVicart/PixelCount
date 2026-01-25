@@ -82,7 +82,6 @@ compose.resources {
 }
 
 compose.desktop {
-    this.application {}
     application {
         mainClass = "dev.vicart.pixelcount.MainKt"
         buildTypes {
@@ -94,7 +93,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            packageName = "pixelcount"
+            packageName = "PixelCount"
             vendor = "ClementVicart"
             packageVersion = version.toString()
 
