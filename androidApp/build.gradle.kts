@@ -35,12 +35,16 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file(providers.gradleProperty("android.storeFile").get())
-            storePassword = providers.gradleProperty("android.storePassword").get()
-            keyAlias = providers.gradleProperty("android.alias").get()
-            keyPassword = providers.gradleProperty("android.keyPassword").get()
-            storeType = "JKS"
+        providers.gradleProperty("android.sign").getOrElse("false").toBoolean().let {
+            if(it) {
+                create("release") {
+                    storeFile = file(providers.gradleProperty("android.storeFile").get())
+                    storePassword = providers.gradleProperty("android.storePassword").get()
+                    keyAlias = providers.gradleProperty("android.alias").get()
+                    keyPassword = providers.gradleProperty("android.keyPassword").get()
+                    storeType = "JKS"
+                }
+            }
         }
     }
 
@@ -51,7 +55,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt")
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 }
