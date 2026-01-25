@@ -34,3 +34,37 @@ jobs:
         with:
           name: pixelcount-${{ matrix.os }}
           path: kmp/build/compose/jars/pixelcount-*-release.jar
+
+  build-android-bundle:
+    name: Build Android Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set gradle permission
+        run: chmod +x gradlew
+
+      - name: Write keystore
+        run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > keystore.jks
+
+      - name: Build Android Bundle
+        run: |
+          ./gradlew --no-daemon bundleRelease -Pandroid.sign=true -Pandroid.storeFile=keystore.jks \
+            -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}"
+
+      - name: Upload Android Bundle
+        uses: actions/upload-artifact@v6
+        with:
+          name: pixelcount-android
+          path: androidApp/build/outputs/bundle/release/androidApp-release.aab
