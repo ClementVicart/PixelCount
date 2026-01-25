@@ -59,7 +59,7 @@ jobs:
 
       - name: Build Android Bundle
         run: |
-          ./gradlew --no-daemon bundleRelease -Pandroid.sign=true -Pandroid.storeFile=keystore.jks \
+          ./gradlew --no-daemon bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}"
 
