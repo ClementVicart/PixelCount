@@ -3,6 +3,7 @@ package dev.vicart.pixelcount.platform
 import androidx.activity.ComponentActivity
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
@@ -16,10 +17,10 @@ fun ComponentActivity.registerContentProviderFactory() {
 
 private class ContentProviderFactoryImpl(private val activity: ComponentActivity) : ContentProviderFactory {
 
-    private val imageChannel = Channel<ByteArray?>()
+    private var imageDeferred: CompletableDeferred<ByteArray?>? = null
 
     private val pickImageLauncher = activity.registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-        imageChannel.trySend(it?.let {
+        imageDeferred?.complete(it?.let {
             activity.contentResolver.openInputStream(it)?.use {
                 it.readBytes()
             }
@@ -27,8 +28,10 @@ private class ContentProviderFactoryImpl(private val activity: ComponentActivity
     }
 
     override suspend fun pickImage(): ByteArray? {
+        imageDeferred?.cancel()
+        imageDeferred = CompletableDeferred()
         pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        return imageChannel.receive()
+        return imageDeferred?.await()
     }
 
     @OptIn(ExperimentalUuidApi::class)

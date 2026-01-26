@@ -14,6 +14,7 @@ import dev.vicart.pixelcount.util.prettyPrint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -49,17 +50,16 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
     }.mapLatest {
         try {
             it?.decodeToImageBitmap()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }.flowOn(Dispatchers.Default)
 
     val canAdd = combine(paymentType, title, amount, transferTo) { paymentType, title, amount, transferTo ->
         if(paymentType == PaymentTypeEnum.PAYMENT || paymentType == PaymentTypeEnum.REFUND)
-            title.isNotBlank() && amount.isNotBlank() && amount.toDoubleOrNull() != null &&
-                    amount.toDouble() <= 1000.0
+            title.isNotBlank() && amount.isNotBlank() && amount.toDoubleOrNull() != null
         else
-            amount.isNotBlank() && amount.toDoubleOrNull() != null && amount.toDouble() <= 1000.0
+            amount.isNotBlank() && amount.toDoubleOrNull() != null && transferTo != null
     }
 
     val expenseGroup = ExpenseGroupRepository.getExpenseGroupFromId(itemId)
@@ -114,7 +114,6 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
                     deleteImage(id)
                 }
             }
-        }.invokeOnCompletion {
             if(initial == null) {
                 ExpenseGroupRepository.insertExpense(expense)
             } else {
@@ -124,8 +123,8 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
     }
 
     fun deleteExpense() {
-        ExpenseGroupRepository.deleteExpense(initial!!)
         viewModelScope.launch {
+            ExpenseGroupRepository.deleteExpense(initial!!)
             deleteImage(initial.id)
         }
     }

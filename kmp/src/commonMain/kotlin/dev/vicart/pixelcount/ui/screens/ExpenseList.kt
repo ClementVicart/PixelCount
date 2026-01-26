@@ -13,11 +13,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
@@ -25,8 +29,15 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +54,18 @@ import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expense_groups
+import dev.vicart.pixelcount.resources.import
 import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.no_expense_yet
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseListViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.LocalResourceReader
+import org.jetbrains.compose.resources.ResourceEnvironment
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 
@@ -58,10 +76,17 @@ fun ExpenseListScreen(
     addExpenseGroup: () -> Unit,
     selectedItem: Uuid? = null,
     selectItem: (Uuid) -> Unit,
-    onEdit: (ExpenseGroup) -> Unit
+    onEdit: (ExpenseGroup) -> Unit,
+    closeDetail: (Uuid) -> Unit
 ) {
     Scaffold(
-        floatingActionButton = { AddExpenseGroupFab(onClick = addExpenseGroup) }
+        floatingActionButton = { AddExpenseGroupFab(onClick = addExpenseGroup) },
+        topBar = {
+            TopBar(
+                onImport = vm::importGroup
+            )
+        },
+        snackbarHost = { SnackBar(vm) }
     ) {
 
         val expenses by vm.expenses.collectAsStateWithLifecycle()
@@ -72,14 +97,6 @@ fun ExpenseListScreen(
                 .padding(it),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                Text(
-                    text = stringResource(Res.string.expense_groups),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
             if(expenses.isEmpty()) {
                 item {
                     EmptyContent(
@@ -134,7 +151,11 @@ fun ExpenseListScreen(
                             ConfirmDeleteGroupExpenseDialog(
                                 isVisible = deleteDialogVisible,
                                 onDismiss = { deleteDialogVisible = false },
-                                onConfirm = { vm.deleteExpenseGroup(it) }
+                                onConfirm = {
+                                    vm.deleteExpenseGroup(it)
+                                    closeDetail(it.id)
+                                    deleteDialogVisible = false
+                                }
                             )
                         }
                     }
@@ -154,4 +175,52 @@ private fun AddExpenseGroupFab(
         expanded = true,
         icon = { Icon(Icons.Default.Add, null) }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun TopBar(
+    onImport: () -> Unit
+) {
+    TopAppBar(
+        title = { Text(stringResource(Res.string.expense_groups)) },
+        actions = {
+            Box {
+                var menuExpanded by remember { mutableStateOf(false) }
+                FilledTonalIconButton(
+                    onClick = { menuExpanded = true },
+                    shapes = IconButtonDefaults.shapes()
+                ) {
+                    Icon(Icons.Default.MoreVert, null)
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.import)) },
+                        leadingIcon = { Icon(Icons.Default.Download, null) },
+                        onClick = onImport
+                    )
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun SnackBar(
+    vm: ExpenseListViewModel
+) {
+    val state = remember { SnackbarHostState() }
+
+    LaunchedEffect(vm) {
+        vm.errorChannel.receiveAsFlow().collectLatest {
+            state.showSnackbar(getString(it.messageRes))
+        }
+    }
+
+    SnackbarHost(state)
 }

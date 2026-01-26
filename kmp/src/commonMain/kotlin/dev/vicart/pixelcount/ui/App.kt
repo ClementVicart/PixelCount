@@ -67,6 +67,9 @@ fun App() = AppTheme {
                     },
                     onEdit = {
                         backStack.add(Screens.AddExpenseGroup(it))
+                    },
+                    closeDetail = { uuid ->
+                        backStack.removeAll { it is Screens.Expense.Detail && it.id == uuid }
                     }
                 )
             }

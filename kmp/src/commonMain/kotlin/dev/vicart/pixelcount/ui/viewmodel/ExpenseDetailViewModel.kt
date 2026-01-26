@@ -8,11 +8,13 @@ import dev.vicart.pixelcount.model.Expense
 import dev.vicart.pixelcount.model.ExpenseGroup
 import dev.vicart.pixelcount.model.PaymentTypeEnum
 import dev.vicart.pixelcount.platform.deleteImage
+import dev.vicart.pixelcount.platform.export
 import dev.vicart.pixelcount.platform.hasImage
 import dev.vicart.pixelcount.service.BalanceCalculatorService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -20,6 +22,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.math.RoundingMode
+import kotlin.collections.toSortedMap
 import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
@@ -32,7 +35,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         .mapLatest {
             it.groupBy { it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.mapValues {
                 it.value.sortedByDescending { it.datetime }
-            }
+            }.toSortedMap { first, second -> second.compareTo(first) }
         }
 
     val myExpenses = expenseGroup.mapLatest {
@@ -56,9 +59,9 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun deleteExpenseGroup() {
-        ExpenseGroupRepository.deleteExpenseGroup(expenseGroup.value!!)
-        expenseGroup.value!!.expenses.forEach {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            ExpenseGroupRepository.deleteExpenseGroup(expenseGroup.value!!)
+            expenseGroup.value!!.expenses.forEach {
                 deleteImage(it.id)
             }
         }
@@ -74,6 +77,12 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
             datetime = Clock.System.now()
         )
 
-        ExpenseGroupRepository.insertExpense(expense)
+        viewModelScope.launch {
+            ExpenseGroupRepository.insertExpense(expense)
+        }
+    }
+
+    fun exportGroup() {
+        export(expenseGroup.value!!.title, expenseGroup.value!!, ExpenseGroup.serializer())
     }
 }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.Currency
 import java.util.Locale
 import kotlin.uuid.Uuid
@@ -54,10 +55,12 @@ class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewMod
             expenses = emptyList(),
             currency = currency.value
         )
-        if(initialItem == null) {
-            ExpenseGroupRepository.insert(expenseGroup)
-        } else {
-            ExpenseGroupRepository.update(expenseGroup)
+        viewModelScope.launch {
+            if(initialItem == null) {
+                ExpenseGroupRepository.insert(expenseGroup)
+            } else {
+                ExpenseGroupRepository.update(expenseGroup)
+            }
         }
     }
 }

@@ -17,27 +17,27 @@ object ExpenseGroupRepository {
 
     val expenseGroups = dao.selectAll.shareIn(shareScope, SharingStarted.Eagerly, replay = 1)
 
-    fun insert(expenseGroup: ExpenseGroup) {
+    suspend fun insert(expenseGroup: ExpenseGroup) {
         dao.insertExpenseGroup(expenseGroup)
     }
 
     fun getExpenseGroupFromId(id: Uuid) = dao.getExpenseGroupFromId(id)
 
-    fun update(expenseGroup: ExpenseGroup) = dao.updateExpenseGroup(expenseGroup)
+    suspend fun update(expenseGroup: ExpenseGroup) = dao.updateExpenseGroup(expenseGroup)
 
-    fun insertExpense(expense: Expense) {
+    suspend fun insertExpense(expense: Expense) {
         dao.insertExpense(expense)
     }
 
-    fun updateExpense(expense: Expense) {
+    suspend fun updateExpense(expense: Expense) {
         dao.updateExpense(expense)
     }
 
-    fun deleteExpense(expense: Expense) {
+    suspend fun deleteExpense(expense: Expense) {
         dao.deleteExpense(expense)
     }
 
-    fun deleteExpenseGroup(expenseGroup: ExpenseGroup) {
+    suspend fun deleteExpenseGroup(expenseGroup: ExpenseGroup) {
         dao.deleteExpenseGroup(expenseGroup)
     }
 }

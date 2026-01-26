@@ -29,29 +29,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
-import androidx.compose.material.icons.automirrored.outlined.CompareArrows
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.outlined.CreditCard
-import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.ButtonGroupMenuState
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -84,7 +77,6 @@ import dev.vicart.pixelcount.resources.add
 import dev.vicart.pixelcount.resources.add_expense
 import dev.vicart.pixelcount.resources.add_photo
 import dev.vicart.pixelcount.resources.amount
-import dev.vicart.pixelcount.resources.amount_must_be_less_than_limit
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.paid_by
@@ -100,7 +92,6 @@ import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
 import dev.vicart.pixelcount.util.prettyPrint
-import dev.vicart.pixelcount.util.rememberInputRule
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 
@@ -222,13 +213,6 @@ fun AddExpenseScreen(
 
             val amount by vm.amount.collectAsStateWithLifecycle()
 
-            val amountRule = rememberInputRule(
-                value = amount,
-                validator = { it.isEmpty() || it.toDouble() <= 1000.0 },
-                errorMessage = stringResource(Res.string.amount_must_be_less_than_limit,
-                    group?.let { 1000.0.prettyPrint(it.currency) }.orEmpty())
-            )
-
             OutlinedTextField(
                 value = amount,
                 onValueChange = {
@@ -253,9 +237,7 @@ fun AddExpenseScreen(
                         fontSize = with(LocalDensity.current) { 24.dp.toSp() },
                         fontWeight = FontWeight.Bold
                     )
-                },
-                isError = !amountRule.isValid,
-                supportingText = amountRule.error
+                }
             )
 
             Text(

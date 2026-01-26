@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.DropdownMenu
@@ -40,6 +41,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFloatingActionButton
@@ -48,6 +50,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -86,6 +89,7 @@ import dev.vicart.pixelcount.resources.balance
 import dev.vicart.pixelcount.resources.created_by
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expenses
+import dev.vicart.pixelcount.resources.export
 import dev.vicart.pixelcount.resources.my_expenses
 import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
@@ -150,7 +154,8 @@ fun ExpenseDetailScreen(
                     onDeleteExpenseGroup = {
                         vm.deleteExpenseGroup()
                         onBack()
-                    }
+                    },
+                    onExport = vm::exportGroup
                 )
             },
             sheetPeekHeight = max(sheetPeekHeight - 16.dp, 0.dp),
@@ -314,7 +319,7 @@ private fun BalanceList(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(balances) {
+            items(balances, key = { it.hashCode() }) {
                 ListItem(
                     headlineContent = {
                         Text(
@@ -332,17 +337,18 @@ private fun BalanceList(
                             }
                         )
                     },
-                    modifier = Modifier.clip(MaterialTheme.shapes.small),
+                    modifier = Modifier.clip(MaterialTheme.shapes.small).animateItem(
+                        fadeInSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+                        placementSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                        fadeOutSpec = MaterialTheme.motionScheme.fastEffectsSpec()
+                    ),
                     trailingContent = {
-                        FilledIconButton(
+                        OutlinedIconButton(
                             onClick = { vm.completeTransfer(it) },
                             shapes = IconButtonDefaults.shapes(),
                             modifier = Modifier.size(IconButtonDefaults.smallContainerSize(
                                 widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
-                            )),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary
-                            )
+                            ))
                         ) {
                             Icon(Icons.Default.Check, null)
                         }
@@ -463,7 +469,8 @@ private fun TopBar(
     onEdit: () -> Unit,
     shouldShowToolbar: Boolean,
     onAddExpense: () -> Unit,
-    onDeleteExpenseGroup: () -> Unit
+    onDeleteExpenseGroup: () -> Unit,
+    onExport: () -> Unit
 ) {
     TopAppBar(
         title = { Text(group?.title.orEmpty()) },
@@ -510,6 +517,14 @@ private fun TopBar(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false }
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.export)) },
+                        onClick = onExport,
+                        leadingIcon = { Icon(Icons.Default.Share, null) }
+                    )
+
+                    HorizontalDivider()
+
                     var deleteDialogVisible by remember { mutableStateOf(false) }
 
                     DropdownMenuItem(

@@ -11,6 +11,8 @@ import dev.vicart.pixelcount.model.Participant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.exp
 import kotlin.uuid.Uuid
 
@@ -91,40 +93,57 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
     private val queries = database.expenseGroupQueriesQueries
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val selectAll = queries.selectAll()
-        .asFlow()
+    val selectAll = queries.transactionWithResult {
+        queries.selectAll()
+    }.asFlow()
         .mapToList(Dispatchers.IO)
         .mapLatest(selectAllMapper)
 
-    fun insertExpenseGroup(group: ExpenseGroup) {
+    suspend fun insertExpenseGroup(group: ExpenseGroup) = withContext(Dispatchers.IO) {
         queries.transaction {
             queries.insertExpenseGroup(group.id, group.title, group.emoji, group.currency)
             group.participants.forEach {
                 queries.insertParticipant(it.id, it.name, it.mandatory, group.id)
             }
+            group.expenses.forEach { expense ->
+                launch {
+                    insertExpense(expense)
+                }
+            }
         }
     }
 
-    fun getExpenseGroupFromId(id: Uuid) = queries.selectWhereId(id)
-        .asFlow()
+    fun getExpenseGroupFromId(id: Uuid) = queries.transactionWithResult {
+        queries.selectWhereId(id)
+    }.asFlow()
         .mapToList(Dispatchers.IO)
         .mapLatest(selectWhereIdMapper)
         .mapLatest { it.firstOrNull() }
 
-    fun updateExpenseGroup(group: ExpenseGroup) {
+    suspend fun updateExpenseGroup(group: ExpenseGroup) = withContext(Dispatchers.IO) {
         queries.transaction {
             queries.updateExpenseGroup(group.title, group.emoji, group.currency, group.id)
-            val existingParticipants = queries.selectWhereId(group.id).executeAsList().let(selectWhereIdMapper)
-                .flatMap(ExpenseGroup::participants)
+            val existingGroup = queries.selectWhereId(group.id).executeAsList().let(selectWhereIdMapper)
+            val existingParticipants = existingGroup.flatMap(ExpenseGroup::participants)
             val newParticipants = group.participants - existingParticipants.toSet()
             newParticipants.forEach {
                 queries.insertParticipant(it.id, it.name, it.mandatory, group.id)
             }
-            queries.deleteParticipantIdNotIn(group.participants.map(Participant::id), group.id)
+            val deletedParticipants = existingParticipants - group.participants.toSet()
+            deletedParticipants.forEach { participant ->
+                val paidExpenses = existingGroup.flatMap(ExpenseGroup::expenses).filter { it.paidBy == participant }
+                launch {
+                    paidExpenses.forEach { expense ->
+                        deleteExpense(expense)
+                    }
+                    queries.deleteExpenseWithParticipantByParticipantId(participant.id)
+                    deleteParticipant(participant)
+                }
+            }
         }
     }
 
-    fun insertExpense(expense: Expense) {
+    suspend fun insertExpense(expense: Expense) = withContext(Dispatchers.IO) {
         queries.transaction {
             queries.insertExpense(expense.id, expense.type, expense.label, expense.amount, expense.datetime)
             queries.insertExpenseWithParticipant(expense.id, expense.paidBy.id, true)
@@ -134,10 +153,10 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
         }
     }
 
-    fun updateExpense(expense: Expense) {
+    suspend fun updateExpense(expense: Expense) = withContext(Dispatchers.IO) {
         queries.transaction {
             queries.updateExpense(expense.label, expense.amount, expense.id)
-            queries.deleteExpenseWithParticipant(expense.id)
+            queries.deleteExpenseWithParticipantByExpenseId(expense.id)
             queries.insertExpenseWithParticipant(expense.id, expense.paidBy.id, true)
             expense.sharedWith.forEach { participant ->
                 queries.insertExpenseWithParticipant(expense.id, participant.id, false)
@@ -145,24 +164,26 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
         }
     }
 
-    fun deleteExpense(expense: Expense) {
+    suspend fun deleteExpense(expense: Expense) = withContext(Dispatchers.IO) {
         queries.transaction {
-            queries.deleteExpenseWithParticipant(expense.id)
+            queries.deleteExpenseWithParticipantByExpenseId(expense.id)
             queries.deleteExpense(expense.id)
         }
     }
 
-    fun deleteParticipant(participant: Participant) {
+    suspend fun deleteParticipant(participant: Participant) = withContext(Dispatchers.IO) {
         queries.transaction {
             queries.deleteParticipant(participant.id)
         }
     }
 
-    fun deleteExpenseGroup(expenseGroup: ExpenseGroup) {
+    suspend fun deleteExpenseGroup(expenseGroup: ExpenseGroup) = withContext(Dispatchers.IO) {
         queries.transaction {
-            expenseGroup.expenses.forEach(::deleteExpense)
-            expenseGroup.participants.forEach(::deleteParticipant)
-            queries.deleteExpenseGroup(expenseGroup.id)
+            launch {
+                expenseGroup.expenses.forEach { deleteExpense(it) }
+                expenseGroup.participants.forEach { deleteParticipant(it) }
+                queries.deleteExpenseGroup(expenseGroup.id)
+            }
         }
     }
 }

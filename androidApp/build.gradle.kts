@@ -64,4 +64,5 @@ dependencies {
     implementation(project(":kmp"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.material)
+    implementation(libs.kotlinx.json)
 }

@@ -34,8 +34,11 @@ INSERT INTO ExpenseGroupExpenseParticipant(ege_id, ep_id, payer) VALUES (?, ?, ?
 updateExpense:
 UPDATE ExpenseGroupExpense SET label=?, amount=? WHERE id=?;
 
-deleteExpenseWithParticipant:
+deleteExpenseWithParticipantByExpenseId:
 DELETE FROM ExpenseGroupExpenseParticipant WHERE ege_id=?;
+
+deleteExpenseWithParticipantByParticipantId:
+DELETE FROM ExpenseGroupExpenseParticipant WHERE ep_id=?;
 
 deleteExpense:
 DELETE FROM ExpenseGroupExpense WHERE id=?;
