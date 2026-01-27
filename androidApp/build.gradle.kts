@@ -65,4 +65,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.material)
     implementation(libs.kotlinx.json)
+
+    implementation(libs.play.services.wearable)
 }

@@ -41,4 +41,8 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.material3)
     implementation(libs.wear.compose.navigation)
+
+    implementation(libs.play.services.wearable)
+
+    implementation(project(":shared"))
 }

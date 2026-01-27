@@ -2,7 +2,6 @@ package dev.vicart.pixelcount.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.vicart.pixelcount.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.Participant
 import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
@@ -10,6 +9,7 @@ import dev.vicart.pixelcount.platform.deleteImage
 import dev.vicart.pixelcount.platform.pickImage
 import dev.vicart.pixelcount.platform.readImage
 import dev.vicart.pixelcount.platform.writeImage
+import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.util.prettyPrint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

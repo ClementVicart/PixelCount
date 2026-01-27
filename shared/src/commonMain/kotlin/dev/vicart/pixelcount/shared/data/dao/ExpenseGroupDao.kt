@@ -186,4 +186,15 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
             }
         }
     }
+
+    suspend fun deleteAll() = withContext(Dispatchers.IO) {
+        queries.transaction {
+            val allExpenses = queries.selectAll().executeAsList().let(selectAllMapper)
+            launch {
+                allExpenses.forEach {
+                    deleteExpenseGroup(it)
+                }
+            }
+        }
+    }
 }

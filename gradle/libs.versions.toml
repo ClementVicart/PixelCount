@@ -23,6 +23,9 @@ lifecycle = "2.10.0-alpha06"
 # Compose Wear
 compose-wear = "1.5.6"
 
+# GMS
+play-services-wearable = "19.0.0"
+
 # Data
 sqldelight = "2.2.1"
 
@@ -43,6 +46,7 @@ lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
@@ -56,6 +60,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "compose-wear" }
 wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "compose-wear" }
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "compose-wear" }
+play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "play-services-wearable" }
 
 
 [plugins]
@@ -63,6 +68,7 @@ wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation",
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 
 # Android
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -17,6 +17,13 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".service.DataListenerService" android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED"/>
+                <data android:scheme="wear" android:host="*"/>
+            </intent-filter>
+        </service>
+
         <meta-data android:name="com.google.android.wearable.standalone" android:value="false"/>
     </application>
 </manifest>

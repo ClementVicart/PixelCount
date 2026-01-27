@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.android.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 kotlin {
@@ -44,6 +45,8 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
+            implementation(libs.play.services.wearable)
+            implementation(libs.kotlinx.coroutines.play.services)
         }
     }
 }

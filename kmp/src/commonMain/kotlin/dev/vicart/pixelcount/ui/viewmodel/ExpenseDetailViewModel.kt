@@ -2,7 +2,6 @@ package dev.vicart.pixelcount.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.vicart.pixelcount.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.shared.model.Balance
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
@@ -11,6 +10,7 @@ import dev.vicart.pixelcount.platform.deleteImage
 import dev.vicart.pixelcount.platform.export
 import dev.vicart.pixelcount.platform.hasImage
 import dev.vicart.pixelcount.service.BalanceCalculatorService
+import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
