@@ -68,3 +68,9 @@ jobs:
         with:
           name: pixelcount-android
           path: androidApp/build/outputs/bundle/release/androidApp-release.aab
+
+      - name: Upload Wear OS Bundle
+        uses: actions/upload-artifact@v6
+        with:
+          name: pixelcount-wearos
+          path: wearosApp/build/outputs/bundle/release/wearosApp-release.aab

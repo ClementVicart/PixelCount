@@ -33,6 +33,31 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    signingConfigs {
+        providers.gradleProperty("android.sign").getOrElse("false").toBoolean().let {
+            if(it) {
+                create("release") {
+                    storeFile = file(providers.gradleProperty("android.storeFile").get())
+                    storePassword = providers.gradleProperty("android.storePassword").get()
+                    keyAlias = providers.gradleProperty("android.alias").get()
+                    keyPassword = providers.gradleProperty("android.keyPassword").get()
+                    storeType = "JKS"
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt")
+            )
+            signingConfig = signingConfigs.findByName("release")
+        }
+    }
 }
 
 dependencies {
