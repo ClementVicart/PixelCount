@@ -43,6 +43,9 @@ dependencies {
     implementation(libs.wear.compose.navigation)
 
     implementation(libs.play.services.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.kotlinx.datetime)
 
     implementation(project(":shared"))
 }

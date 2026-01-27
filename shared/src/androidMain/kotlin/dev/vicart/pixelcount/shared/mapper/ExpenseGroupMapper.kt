@@ -53,17 +53,18 @@ object ExpenseGroupMapper {
             emoji = dataMap.getString("emoji")!!,
             currency = Currency.getInstance(dataMap.getString("currency")!!),
             participants = dataMap.getDataMapArrayList("participants")!!.map(::toParticipant),
-            expenses = dataMap.getDataMapArrayList("expenses")!!.map {
+            expenses = dataMap.getDataMapArrayList("expenses")?.map {
                 Expense(
                     id = Uuid.parse(it.getString("id")!!),
                     label = it.getString("label")!!,
-                    type = PaymentTypeEnum.valueOf(dataMap.getString("type")!!),
-                    amount = dataMap.getDouble("amount"),
-                    datetime = Instant.fromEpochMilliseconds(dataMap.getLong("datetime")!!),
+                    type = PaymentTypeEnum.valueOf(it.getString("type")!!),
+                    amount = it.getDouble("amount"),
+                    datetime = Instant.fromEpochMilliseconds(it.getLong("datetime")),
                     paidBy = toParticipant(it.getDataMap("paidBy")!!),
-                    sharedWith = it.getDataMapArrayList("sharedWith")!!.map(::toParticipant)
+                    sharedWith = it.getDataMapArrayList("sharedWith")?.map(::toParticipant)
+                        ?: emptyList()
                 )
-            }
+            } ?: emptyList()
         )
     }
 
