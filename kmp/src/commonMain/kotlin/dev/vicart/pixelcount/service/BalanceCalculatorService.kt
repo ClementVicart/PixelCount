@@ -1,9 +1,9 @@
 package dev.vicart.pixelcount.service
 
-import dev.vicart.pixelcount.model.Balance
-import dev.vicart.pixelcount.model.ExpenseGroup
-import dev.vicart.pixelcount.model.Participant
-import dev.vicart.pixelcount.model.PaymentTypeEnum
+import dev.vicart.pixelcount.shared.model.Balance
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.model.Participant
+import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -1,8 +1,8 @@
 package dev.vicart.pixelcount.data.repository
 
-import dev.vicart.pixelcount.data.database.Database
-import dev.vicart.pixelcount.model.Expense
-import dev.vicart.pixelcount.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.data.database.Database
+import dev.vicart.pixelcount.shared.model.Expense
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

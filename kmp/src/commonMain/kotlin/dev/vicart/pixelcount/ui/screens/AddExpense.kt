@@ -68,10 +68,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.vicart.pixelcount.model.Expense
-import dev.vicart.pixelcount.model.ExpenseGroup
-import dev.vicart.pixelcount.model.Participant
-import dev.vicart.pixelcount.model.PaymentTypeEnum
+import dev.vicart.pixelcount.shared.model.Expense
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.model.Participant
+import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add
 import dev.vicart.pixelcount.resources.add_expense

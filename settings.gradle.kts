@@ -15,4 +15,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":kmp", ":androidApp")
+include(":kmp", ":shared", ":androidApp", ":wearosApp")

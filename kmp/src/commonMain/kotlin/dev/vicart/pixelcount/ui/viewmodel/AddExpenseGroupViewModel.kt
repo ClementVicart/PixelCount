@@ -3,8 +3,8 @@ package dev.vicart.pixelcount.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.vicart.pixelcount.data.repository.ExpenseGroupRepository
-import dev.vicart.pixelcount.model.ExpenseGroup
-import dev.vicart.pixelcount.model.Participant
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.model.Participant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine

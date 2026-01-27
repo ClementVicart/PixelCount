@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.android.multiplatform.library)
-    alias(libs.plugins.sqldelight)
 }
 
 group = "dev.vicart.pixelcount"
@@ -56,21 +55,16 @@ kotlin {
             implementation(libs.kotlinx.json)
             implementation(libs.kotlinx.datetime)
 
-            implementation(libs.sqldelight.coroutines)
+            api(project(":shared"))
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.sqldelight.jvm)
             implementation(libs.kotlinx.coroutines.swing)
         }
 
         commonTest.dependencies {
             implementation(kotlin("test"))
-        }
-
-        androidMain.dependencies {
-            implementation(libs.sqldelight.android)
         }
     }
 }
@@ -107,15 +101,6 @@ compose.desktop {
             windows {
                 iconFile.set(project.file("assets/favicon.ico"))
             }
-        }
-    }
-}
-
-sqldelight {
-    databases {
-        create("PixelCountDatabase") {
-            packageName = "dev.vicart.pixelcount.data.database"
-            srcDirs("src/commonMain/sqldelight")
         }
     }
 }
