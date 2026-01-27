@@ -2,10 +2,13 @@ package dev.vicart.pixelcount.ui.screens
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -72,164 +76,172 @@ fun AddExpenseGroupScreen(
             )
         }
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(it)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .fillMaxSize()
+                .padding(it),
+            contentAlignment = Alignment.Center
         ) {
-            val title by vm.title.collectAsStateWithLifecycle()
-            OutlinedTextField(
-                value = title,
-                onValueChange = { vm.title.value = it },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                label = { Text(stringResource(Res.string.title)) },
-                placeholder = { Text(stringResource(Res.string.ski_vacations)) },
-                leadingIcon = {
-                    val emoji by vm.emoji.collectAsStateWithLifecycle()
-                    EmojiPicker(
-                        emoji = emoji,
-                        onEmojiSelected = { vm.emoji.value = it }
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
-                    imeAction = ImeAction.Next
-                ),
-                singleLine = true
-            )
-
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainerLow
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .animateContentSize(MaterialTheme.motionScheme.defaultSpatialSpec()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(Res.string.participants),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    val userName by vm.userName.collectAsStateWithLifecycle()
-                    OutlinedTextField(
-                        value = userName,
-                        onValueChange = { vm.userName.value = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(Res.string.you)) },
-                        placeholder = { Text(stringResource(Res.string.your_name)) },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    val participants by vm.participants.collectAsStateWithLifecycle()
-                    participants.forEach { participant ->
-                        OutlinedTextField(
-                            value = participant.name,
-                            onValueChange = {},
-                            modifier = Modifier.fillMaxWidth(),
-                            readOnly = true,
-                            singleLine = true,
-                            trailingIcon = {
-                                FilledTonalIconButton(
-                                    onClick = { vm.deleteParticipant(participant) },
-                                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.errorContainer
-                                    )
-                                ) {
-                                    Icon(Icons.Default.Delete, null)
-                                }
-                            }
-                        )
-                    }
-
-                    var newParticipantName by remember { mutableStateOf("") }
-                    OutlinedTextField(
-                        value = newParticipantName,
-                        onValueChange = { newParticipantName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        label = { Text(stringResource(Res.string.participant_name)) },
-                        placeholder = { Text(stringResource(Res.string.john_doe)) },
-                        trailingIcon = {
-                            FilledIconButton(
-                                onClick = {
-                                    vm.addParticipant(newParticipantName)
-                                    newParticipantName = ""
-                                },
-                                enabled = newParticipantName.isNotBlank(),
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondary
-                                )
-                            ) {
-                                Icon(Icons.Default.PersonAdd, null)
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                vm.addParticipant(newParticipantName)
-                                newParticipantName = ""
-                            }
-                        )
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(Res.string.options),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            val currency by vm.currency.collectAsStateWithLifecycle()
-
-            var menuExpanded by remember(currency) { mutableStateOf(false) }
-
-            var query by remember(currency) { mutableStateOf(currency.displayName) }
-
-            ExposedDropdownMenuBox(
-                expanded = menuExpanded,
-                onExpandedChange = { menuExpanded = it },
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
+                val title by vm.title.collectAsStateWithLifecycle()
                 OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
+                    value = title,
+                    onValueChange = { vm.title.value = it },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    label = { Text(stringResource(Res.string.title)) },
+                    placeholder = { Text(stringResource(Res.string.ski_vacations)) },
                     leadingIcon = {
-                        Text(text = currency.symbol)
+                        val emoji by vm.emoji.collectAsStateWithLifecycle()
+                        EmojiPicker(
+                            emoji = emoji,
+                            onEmojiSelected = { vm.emoji.value = it }
+                        )
                     },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuExpanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                        imeAction = ImeAction.Next
+                    ),
+                    singleLine = true
                 )
 
-                ExposedDropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = MaterialTheme.shapes.small
                 ) {
-                    val availableCurrencies by vm.availableCurrencies.collectAsStateWithLifecycle(emptyList())
-
-                    availableCurrencies.filter { it.displayName.contains(query, true) }.forEach { currency ->
-                        DropdownMenuItem(
-                            text = { Text(currency.displayName) },
-                            onClick = { vm.currency.value = currency },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                            leadingIcon = {
-                                Text(text = currency.symbol)
-                            }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .animateContentSize(MaterialTheme.motionScheme.defaultSpatialSpec()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.participants),
+                            style = MaterialTheme.typography.titleMedium
                         )
+
+                        val userName by vm.userName.collectAsStateWithLifecycle()
+                        OutlinedTextField(
+                            value = userName,
+                            onValueChange = { vm.userName.value = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text(stringResource(Res.string.you)) },
+                            placeholder = { Text(stringResource(Res.string.your_name)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+
+                        val participants by vm.participants.collectAsStateWithLifecycle()
+                        participants.forEach { participant ->
+                            OutlinedTextField(
+                                value = participant.name,
+                                onValueChange = {},
+                                modifier = Modifier.fillMaxWidth(),
+                                readOnly = true,
+                                singleLine = true,
+                                trailingIcon = {
+                                    FilledTonalIconButton(
+                                        onClick = { vm.deleteParticipant(participant) },
+                                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.errorContainer
+                                        )
+                                    ) {
+                                        Icon(Icons.Default.Delete, null)
+                                    }
+                                }
+                            )
+                        }
+
+                        var newParticipantName by remember { mutableStateOf("") }
+                        OutlinedTextField(
+                            value = newParticipantName,
+                            onValueChange = { newParticipantName = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            label = { Text(stringResource(Res.string.participant_name)) },
+                            placeholder = { Text(stringResource(Res.string.john_doe)) },
+                            trailingIcon = {
+                                FilledIconButton(
+                                    onClick = {
+                                        vm.addParticipant(newParticipantName)
+                                        newParticipantName = ""
+                                    },
+                                    enabled = newParticipantName.isNotBlank(),
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                ) {
+                                    Icon(Icons.Default.PersonAdd, null)
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    vm.addParticipant(newParticipantName)
+                                    newParticipantName = ""
+                                }
+                            )
+                        )
+                    }
+                }
+
+                Text(
+                    text = stringResource(Res.string.options),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                val currency by vm.currency.collectAsStateWithLifecycle()
+
+                var menuExpanded by remember(currency) { mutableStateOf(false) }
+
+                var query by remember(currency) { mutableStateOf(currency.displayName) }
+
+                ExposedDropdownMenuBox(
+                    expanded = menuExpanded,
+                    onExpandedChange = { menuExpanded = it },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        leadingIcon = {
+                            Text(text = currency.symbol)
+                        },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuExpanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        val availableCurrencies by vm.availableCurrencies.collectAsStateWithLifecycle(emptyList())
+
+                        availableCurrencies.filter { it.displayName.contains(query, true) }.forEach { currency ->
+                            DropdownMenuItem(
+                                text = { Text(currency.displayName) },
+                                onClick = { vm.currency.value = currency },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                leadingIcon = {
+                                    Text(text = currency.symbol)
+                                }
+                            )
+                        }
                     }
                 }
             }

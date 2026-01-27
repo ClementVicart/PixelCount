@@ -49,14 +49,19 @@ object ExpenseGroupService {
 
     fun getExpenseGroupFromId(id: Uuid) = repository.getExpenseGroupFromId(id)
 
-    suspend fun update(expenseGroup: ExpenseGroup) = repository.update(expenseGroup)
-
-    suspend fun insertExpense(expense: Expense) {
-        repository.insertExpense(expense)
+    suspend fun update(expenseGroup: ExpenseGroup) {
+        repository.update(expenseGroup)
+        publishService?.publishGroup(expenseGroup)
     }
 
-    suspend fun updateExpense(expense: Expense) {
+    suspend fun insertExpense(group: ExpenseGroup, expense: Expense) {
+        repository.insertExpense(expense)
+        publishService?.publishGroup(group)
+    }
+
+    suspend fun updateExpense(group: ExpenseGroup, expense: Expense) {
         repository.updateExpense(expense)
+        publishService?.publishGroup(group)
     }
 
     suspend fun deleteExpense(expense: Expense) {

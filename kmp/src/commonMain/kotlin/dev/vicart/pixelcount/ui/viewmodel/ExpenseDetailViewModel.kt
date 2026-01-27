@@ -66,7 +66,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         )
 
         viewModelScope.launch {
-            ExpenseGroupService.insertExpense(expense)
+            ExpenseGroupService.insertExpense(expenseGroup.value!!, expense)
         }
     }
 
