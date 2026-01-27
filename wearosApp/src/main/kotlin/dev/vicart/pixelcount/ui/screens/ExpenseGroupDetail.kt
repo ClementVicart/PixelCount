@@ -18,6 +18,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
+import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseGroupDetailViewModel
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
@@ -64,8 +65,9 @@ fun ExpenseGroupDetailScreen(
                         )
                     }
 
+                    val myExpenses by vm.myExpenses.collectAsStateWithLifecycle(0.0)
                     Text(
-                        text = "9255.00 €",
+                        text = group?.currency?.let { myExpenses.prettyPrint(it) }.orEmpty(),
                         style = MaterialTheme.typography.numeralSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -83,8 +85,9 @@ fun ExpenseGroupDetailScreen(
                         )
                     }
 
+                    val totalExpenses by vm.totalExpenses.collectAsStateWithLifecycle(0.0)
                     Text(
-                        text = "9255.00 €",
+                        text = group?.currency?.let { totalExpenses.prettyPrint(it) }.orEmpty(),
                         style = MaterialTheme.typography.numeralSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -97,17 +100,17 @@ fun ExpenseGroupDetailScreen(
                 }
             }
 
-            items(group?.expenses ?: emptyList(), key = { it.id.toString() }) {
+            items(group?.expenses ?: emptyList(), key = { it.id.toString() }) { expense ->
                 TitleCard(
                     onClick = {},
-                    title = { Text(it.label) },
+                    title = { Text(expense.label) },
                     subtitle = {
                         Text(
-                            text = it.amount.toString()
+                            text = group?.currency?.let { expense.amount.prettyPrint(it) }.orEmpty()
                         )
                     },
                     time = {
-                        Text(it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime()
+                        Text(expense.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime()
                             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)))
                     }
                 )

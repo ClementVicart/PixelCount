@@ -1,5 +1,6 @@
 package dev.vicart.pixelcount.shared.data.repository
 
+import dev.vicart.pixelcount.shared.data.dao.ExpenseGroupDao
 import dev.vicart.pixelcount.shared.data.database.Database
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
@@ -12,21 +13,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlin.uuid.Uuid
 
-object ExpenseGroupRepository {
+class ExpenseGroupRepository(private val dao: ExpenseGroupDao) {
 
-    private val dao by lazy { Database.expenseGroupDao }
     var publishService: PublisherService? = null
     private val shareScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val expenseGroups = dao.selectAll
-        .shareIn(shareScope, SharingStarted.Eagerly, replay = 1)
-        .onEach {
-            publishService?.publishGroups(it)
-        }
 
     suspend fun insert(expenseGroup: ExpenseGroup) {
         dao.insertExpenseGroup(expenseGroup)
-        publishService?.publishGroup(expenseGroup)
     }
 
     fun getExpenseGroupFromId(id: Uuid) = dao.getExpenseGroupFromId(id)

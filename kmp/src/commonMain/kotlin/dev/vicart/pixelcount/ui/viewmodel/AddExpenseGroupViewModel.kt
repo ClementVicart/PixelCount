@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.shared.model.Participant
+import dev.vicart.pixelcount.shared.service.ExpenseGroupService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -57,9 +58,9 @@ class AddExpenseGroupViewModel(private val initialItem: ExpenseGroup?) : ViewMod
         )
         viewModelScope.launch {
             if(initialItem == null) {
-                ExpenseGroupRepository.insert(expenseGroup)
+                ExpenseGroupService.insert(expenseGroup)
             } else {
-                ExpenseGroupRepository.update(expenseGroup)
+                ExpenseGroupService.update(expenseGroup)
             }
         }
     }

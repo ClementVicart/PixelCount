@@ -10,6 +10,8 @@ import dev.vicart.pixelcount.platform.pickImage
 import dev.vicart.pixelcount.platform.readImage
 import dev.vicart.pixelcount.platform.writeImage
 import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
+import dev.vicart.pixelcount.shared.service.ExpenseGroupService
+import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.util.prettyPrint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,7 +60,7 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
             amount.isNotBlank() && amount.toDoubleOrNull() != null && transferTo != null
     }
 
-    val expenseGroup = ExpenseGroupRepository.getExpenseGroupFromId(itemId)
+    val expenseGroup = ExpenseGroupService.getExpenseGroupFromId(itemId)
         .onEach {
             if(paidBy.value == null) {
                 paidBy.value = it?.participants?.single { it.mandatory }
@@ -111,16 +113,16 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
                 }
             }
             if(initial == null) {
-                ExpenseGroupRepository.insertExpense(expense)
+                ExpenseGroupService.insertExpense(expense)
             } else {
-                ExpenseGroupRepository.updateExpense(expense)
+                ExpenseGroupService.updateExpense(expense)
             }
         }
     }
 
     fun deleteExpense() {
         viewModelScope.launch {
-            ExpenseGroupRepository.deleteExpense(initial!!)
+            ExpenseGroupService.deleteExpense(initial!!)
             deleteImage(initial.id)
         }
     }

@@ -88,10 +88,10 @@ import dev.vicart.pixelcount.resources.title
 import dev.vicart.pixelcount.resources.to
 import dev.vicart.pixelcount.resources.transfer
 import dev.vicart.pixelcount.resources.type
+import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
-import dev.vicart.pixelcount.util.prettyPrint
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 

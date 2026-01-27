@@ -7,6 +7,7 @@ import com.google.android.gms.wearable.DataItemBuffer
 import com.google.android.gms.wearable.DataMapItem
 import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.shared.mapper.ExpenseGroupMapper
+import dev.vicart.pixelcount.shared.service.ExpenseGroupService
 import kotlinx.coroutines.runBlocking
 
 class ExpenseGroupDataService {
@@ -22,7 +23,7 @@ class ExpenseGroupDataService {
             "/expense-groups" -> {
 
                 runBlocking {
-                    ExpenseGroupRepository.deleteAll()
+                    ExpenseGroupService.deleteAll()
                 }
 
                 val map = DataMapItem.fromDataItem(dataItem).dataMap
@@ -33,7 +34,7 @@ class ExpenseGroupDataService {
 
                 expenseGroups.forEach {
                     runBlocking {
-                        ExpenseGroupRepository.insert(it)
+                        ExpenseGroupService.insert(it)
                     }
                 }
             }

@@ -11,6 +11,7 @@ import dev.vicart.pixelcount.platform.export
 import dev.vicart.pixelcount.platform.hasImage
 import dev.vicart.pixelcount.service.BalanceCalculatorService
 import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
+import dev.vicart.pixelcount.shared.service.ExpenseGroupService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
@@ -24,8 +25,12 @@ import kotlin.uuid.Uuid
 
 class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
 
-    val expenseGroup = ExpenseGroupRepository.getExpenseGroupFromId(itemId)
+    val expenseGroup = ExpenseGroupService.getExpenseGroupFromId(itemId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    val myExpenses = ExpenseGroupService.myExpenses(expenseGroup)
+
+    val totalExpenses = ExpenseGroupService.totalExpenses(expenseGroup)
 
     val expenses = expenseGroup.filterNotNull().mapLatest { it.expenses }
         .mapLatest {
@@ -33,19 +38,6 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
                 it.value.sortedByDescending { it.datetime }
             }.toSortedMap { first, second -> second.compareTo(first) }
         }
-
-    val myExpenses = expenseGroup.mapLatest {
-        (it?.expenses
-            ?.filter { it.paidBy.mandatory }
-            ?.filter { it.type == PaymentTypeEnum.PAYMENT }
-            ?.sumOf(Expense::amount) ?: 0.0)
-    }
-
-    val totalExpenses = expenseGroup.mapLatest {
-        (it?.expenses
-            ?.filter { it.type == PaymentTypeEnum.PAYMENT }
-            ?.sumOf(Expense::amount) ?: 0.0)
-    }
 
     val balances = expenseGroup.filterNotNull().mapLatest(::BalanceCalculatorService)
         .mapLatest(BalanceCalculatorService::calculateBalance)
@@ -56,7 +48,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
 
     fun deleteExpenseGroup() {
         viewModelScope.launch {
-            ExpenseGroupRepository.deleteExpenseGroup(expenseGroup.value!!)
+            ExpenseGroupService.deleteExpenseGroup(expenseGroup.value!!)
             expenseGroup.value!!.expenses.forEach {
                 deleteImage(it.id)
             }
@@ -74,7 +66,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         )
 
         viewModelScope.launch {
-            ExpenseGroupRepository.insertExpense(expense)
+            ExpenseGroupService.insertExpense(expense)
         }
     }
 

@@ -1,4 +1,4 @@
-package dev.vicart.pixelcount.util
+package dev.vicart.pixelcount.shared.utils
 
 import java.math.RoundingMode
 import java.util.Currency
