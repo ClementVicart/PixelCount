@@ -29,8 +29,7 @@ jobs:
 
       - name: Build JAR
         run: |
-          ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS \
-            -Papp.version=${{ github.ref_name }}
+          ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS -Papp.version=${{ github.ref_name }}
 
       - name: Upload JAR
         uses: actions/upload-artifact@v6
