@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -70,6 +71,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
@@ -124,14 +126,9 @@ fun ExpenseDetailScreen(
     val shouldShowToolbar = remember(currentWindowSizeClass) {
         currentWindowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
     }
-
-    var scaffoldHeight by remember { mutableStateOf(0.dp) }
-    var contentHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    val sheetPeekHeight = remember(scaffoldHeight, contentHeight) {
-        scaffoldHeight - contentHeight
-    }
+    var sheetPeekHeight by remember { mutableStateOf(0.dp) }
 
     val bottomSheetState = rememberStandardBottomSheetState()
 
@@ -161,17 +158,11 @@ fun ExpenseDetailScreen(
                 )
             },
             sheetPeekHeight = max(sheetPeekHeight - 16.dp, 0.dp),
-            modifier = Modifier.onGloballyPositioned {
-                scaffoldHeight = with(density) { it.size.height.toDp() }
-            },
             scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(it)
-                    .onGloballyPositioned {
-                        contentHeight = with(density) { it.positionInWindow().y.toDp() + it.size.height.toDp() }
-                    },
+                    .padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -226,6 +217,14 @@ fun ExpenseDetailScreen(
                         )
                     }
                 }
+
+                Spacer(
+                    modifier = Modifier.weight(1f).onSizeChanged {
+                        if(sheetPeekHeight == 0.dp) {
+                            sheetPeekHeight = with(density) { it.height.toDp() }
+                        }
+                    }
+                )
             }
         }
 
