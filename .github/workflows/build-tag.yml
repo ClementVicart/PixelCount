@@ -41,6 +41,8 @@ jobs:
   build-android-bundle:
     name: Build Android Bundle
     runs-on: ubuntu-latest
+    outputs:
+      artifacts: ${{ steps.build-android.outputs.artifact-id }},${{ steps.build-wearos.outputs.artifact-id }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v6
@@ -64,6 +66,7 @@ jobs:
         run: echo "VERSION_CODE=$(echo ${{ github.ref_name}} | tr -d '.')$(git rev-list --count HEAD)" > $GITHUB_ENV
 
       - name: Build Android Bundle
+        id: build-android
         run: |
           ./gradlew --no-daemon :androidApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
@@ -71,8 +74,9 @@ jobs:
             -Papp.versionCode=1${{ env.VERSION_CODE }}
 
       - name: Build WearOs Bundle
+        id: build-wearos
         run: |
-          ./gradlew --no-daemon :wearOs:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
+          ./gradlew --no-daemon :wearosApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}" -Papp.version=${{ github.ref_name }} \
             -Papp.versionCode=2${{ env.VERSION_CODE }}
@@ -88,3 +92,31 @@ jobs:
         with:
           name: pixelcount-wearos
           path: wearosApp/build/outputs/bundle/release/wearosApp-release.aab
+
+  publish-google-play:
+    name: Publish AAB to Google Play
+    needs: build-android-bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Android artifact
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.build-android-bundle.outputs.artifacts }}
+
+      - name: Publish Android to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          releaseFiles: 'pixelcount-android/androidApp-release.aab'
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+          packageName: dev.vicart.pixelcount
+          track: qa
+          status: draft
+
+      - name: Publish WearOS to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          releaseFiles: 'pixelcount-wearos/wearosApp-release.aab'
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+          packageName: dev.vicart.pixelcount
+          track: wear:qa
+          status: draft
