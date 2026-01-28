@@ -251,7 +251,8 @@ fun AddExpenseScreen(
             ParticipantSelector(
                 participants = group?.participants.orEmpty(),
                 selectedParticipant = paidBy,
-                onParticipantSelected = { vm.changePaidBy(it) }
+                onParticipantSelected = { vm.changePaidBy(it) },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
             AnimatedContent(
