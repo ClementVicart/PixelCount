@@ -29,7 +29,7 @@ jobs:
 
       - name: Build JAR
         run: |
-          ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS -Papp.version=${{ github.ref_name }}
+          ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS '-Papp.version=${{ github.ref_name }}'
 
       - name: Upload JAR
         uses: actions/upload-artifact@v6
@@ -41,7 +41,7 @@ jobs:
     name: Build Android Bundle
     runs-on: ubuntu-latest
     outputs:
-      artifacts: ${{ steps.build-android.outputs.artifact-id }},${{ steps.build-wearos.outputs.artifact-id }}
+      artifacts: ${{ steps.publish-android.outputs.artifact-id }},${{ steps.publish-wearos.outputs.artifact-id }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v6
@@ -65,7 +65,6 @@ jobs:
         run: echo "VERSION_CODE=$(echo ${{ github.ref_name}} | tr -d '.')$(git rev-list --count HEAD)" > $GITHUB_ENV
 
       - name: Build Android Bundle
-        id: build-android
         run: |
           ./gradlew --no-daemon :androidApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
@@ -73,7 +72,6 @@ jobs:
             -Papp.versionCode=${{ env.VERSION_CODE }}1
 
       - name: Build WearOs Bundle
-        id: build-wearos
         run: |
           ./gradlew --no-daemon :wearosApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
@@ -82,12 +80,14 @@ jobs:
 
       - name: Upload Android Bundle
         uses: actions/upload-artifact@v6
+        id: publish-android
         with:
           name: pixelcount-android
           path: androidApp/build/outputs/bundle/release/androidApp-release.aab
 
       - name: Upload Wear OS Bundle
         uses: actions/upload-artifact@v6
+        id: publish-wearos
         with:
           name: pixelcount-wearos
           path: wearosApp/build/outputs/bundle/release/wearosApp-release.aab
