@@ -3,9 +3,7 @@ package dev.vicart.pixelcount.service
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
-import com.google.android.gms.wearable.DataItemBuffer
 import com.google.android.gms.wearable.DataMapItem
-import dev.vicart.pixelcount.shared.data.repository.ExpenseGroupRepository
 import dev.vicart.pixelcount.shared.mapper.ExpenseGroupMapper
 import dev.vicart.pixelcount.shared.service.ExpenseGroupService
 import kotlinx.coroutines.runBlocking

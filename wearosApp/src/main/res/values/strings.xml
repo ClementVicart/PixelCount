@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">PixelCount</string>
+    <string name="my_expenses">My expenses</string>
+    <string name="total_expenses">Total expenses</string>
+    <string name="expenses">Expenses</string>
 </resources>

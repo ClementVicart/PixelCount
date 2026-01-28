@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.kotlinx.json)
 
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.kotlinx.datetime)
         }
 
         jvmMain.dependencies {

@@ -113,9 +113,9 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
                 }
             }
             if(initial == null) {
-                ExpenseGroupService.insertExpense(expenseGroup.value!!, expense)
+                ExpenseGroupService.insertExpense(expense)
             } else {
-                ExpenseGroupService.updateExpense(expenseGroup.value!!, expense)
+                ExpenseGroupService.updateExpense(expense)
             }
         }
     }

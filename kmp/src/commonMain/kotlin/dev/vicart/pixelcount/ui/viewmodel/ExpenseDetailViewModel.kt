@@ -32,12 +32,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
 
     val totalExpenses = ExpenseGroupService.totalExpenses(expenseGroup)
 
-    val expenses = expenseGroup.filterNotNull().mapLatest { it.expenses }
-        .mapLatest {
-            it.groupBy { it.datetime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.mapValues {
-                it.value.sortedByDescending { it.datetime }
-            }.toSortedMap { first, second -> second.compareTo(first) }
-        }
+    val expenses = ExpenseGroupService.expenses(expenseGroup)
 
     val balances = expenseGroup.filterNotNull().mapLatest(::BalanceCalculatorService)
         .mapLatest(BalanceCalculatorService::calculateBalance)
@@ -66,7 +61,7 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         )
 
         viewModelScope.launch {
-            ExpenseGroupService.insertExpense(expenseGroup.value!!, expense)
+            ExpenseGroupService.insertExpense(expense)
         }
     }
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_expenses">Mes dépenses</string>
+    <string name="total_expenses">Total des dépenses</string>
+    <string name="expenses">Dépenses</string>
+</resources>

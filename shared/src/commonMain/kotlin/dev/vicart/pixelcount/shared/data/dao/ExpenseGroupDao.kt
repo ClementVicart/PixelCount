@@ -8,9 +8,13 @@ import dev.vicart.pixelcount.shared.data.database.PixelCountDatabase
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.shared.model.Participant
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.uuid.Uuid
@@ -92,12 +96,15 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
 
     private val queries = database.expenseGroupQueriesQueries
 
+    private val shareScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val selectAll = queries.transactionWithResult {
         queries.selectAll()
     }.asFlow()
         .mapToList(Dispatchers.IO)
         .mapLatest(selectAllMapper)
+        .shareIn(shareScope, SharingStarted.Eagerly, 1)
 
     suspend fun insertExpenseGroup(group: ExpenseGroup) = withContext(Dispatchers.IO) {
         queries.transaction {

@@ -15,9 +15,6 @@ import kotlin.uuid.Uuid
 
 class ExpenseGroupRepository(private val dao: ExpenseGroupDao) {
 
-    var publishService: PublisherService? = null
-    private val shareScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     val expenseGroups = dao.selectAll
 
     suspend fun insert(expenseGroup: ExpenseGroup) {

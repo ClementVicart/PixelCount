@@ -14,6 +14,5 @@ class PixelCountApplication : Application() {
         super.onCreate()
 
         Database.init(createDatabase(DriverFactory(this)))
-        ExpenseGroupService.publishService = PublisherService(this)
     }
 }

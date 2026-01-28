@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +19,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
+import dev.vicart.pixelcount.R
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseGroupDetailViewModel
 import kotlinx.datetime.TimeZone
@@ -41,6 +43,7 @@ fun ExpenseGroupDetailScreen(
     ) {
 
         val group by vm.expenseGroup.collectAsStateWithLifecycle()
+        val expenses by vm.expenses.collectAsStateWithLifecycle(emptyList())
 
         ScalingLazyColumn(
             state = scalingState,
@@ -61,7 +64,7 @@ fun ExpenseGroupDetailScreen(
                 ) {
                     ListHeader {
                         Text(
-                            text = "My expenses"
+                            text = stringResource(R.string.my_expenses)
                         )
                     }
 
@@ -81,7 +84,7 @@ fun ExpenseGroupDetailScreen(
                 ) {
                     ListHeader {
                         Text(
-                            text = "Total expenses"
+                            text = stringResource(R.string.total_expenses)
                         )
                     }
 
@@ -96,11 +99,11 @@ fun ExpenseGroupDetailScreen(
 
             item {
                 ListHeader {
-                    Text("Expenses")
+                    Text(stringResource(R.string.expenses))
                 }
             }
 
-            items(group?.expenses ?: emptyList(), key = { it.id.toString() }) { expense ->
+            items(expenses, key = { it.id.toString() }) { expense ->
                 TitleCard(
                     onClick = {},
                     title = { Text(expense.label) },
