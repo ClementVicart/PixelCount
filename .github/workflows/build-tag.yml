@@ -70,7 +70,7 @@ jobs:
           ./gradlew --no-daemon :androidApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}" -Papp.version=${{ github.ref_name }} \
-            -Papp.versionCode=1${{ env.VERSION_CODE }}
+            -Papp.versionCode=${{ env.VERSION_CODE }}1
 
       - name: Build WearOs Bundle
         id: build-wearos
@@ -78,7 +78,7 @@ jobs:
           ./gradlew --no-daemon :wearosApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}" -Papp.version=${{ github.ref_name }} \
-            -Papp.versionCode=2${{ env.VERSION_CODE }}
+            -Papp.versionCode=${{ env.VERSION_CODE }}2
 
       - name: Upload Android Bundle
         uses: actions/upload-artifact@v6
