@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "dev.vicart.pixelcount"
-version = providers.gradleProperty("app.version").get()
+version = providers.gradleProperty("app.version").getOrElse("0.0.0")
 
 kotlin {
 

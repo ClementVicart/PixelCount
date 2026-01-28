@@ -1,7 +1,8 @@
+name: Build tag
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*.*.*'
 
 jobs:
   build-jar:
@@ -9,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
       GRADLE_WRAPPER_SCRIPT: ${{ matrix.os == 'windows-latest' && '.\gradlew.bat' || './gradlew' }}
     steps:
@@ -27,7 +28,9 @@ jobs:
         if: env.RUNNER_OS != 'Windows'
 
       - name: Build JAR
-        run: ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS
+        run: |
+          ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS \
+            -Papp.version=${{ github.ref_name }}
 
       - name: Upload JAR
         uses: actions/upload-artifact@v6
@@ -57,11 +60,22 @@ jobs:
       - name: Write keystore
         run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > keystore.jks
 
+      - name: Get version code
+        run: echo "VERSION_CODE=$(echo ${{ github.ref_name}} | tr -d '.')$(git rev-list --count HEAD)" > $GITHUB_ENV
+
       - name: Build Android Bundle
         run: |
-          ./gradlew --no-daemon bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
+          ./gradlew --no-daemon :androidApp:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
             -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}"
+            -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}" -Papp.version=${{ github.ref_name }} \
+            -Papp.versionCode=1${{ env.VERSION_CODE }}
+
+      - name: Build WearOs Bundle
+        run: |
+          ./gradlew --no-daemon :wearOs:bundleRelease -Pandroid.sign=true -Pandroid.storeFile=${{ github.workspace }}/keystore.jks \
+            -Pandroid.storePassword="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.keyPassword="${{ secrets.KEY_PASSWORD }}" -Papp.version=${{ github.ref_name }} \
+            -Papp.versionCode=2${{ env.VERSION_CODE }}
 
       - name: Upload Android Bundle
         uses: actions/upload-artifact@v6
