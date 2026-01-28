@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
@@ -73,6 +75,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -179,12 +182,13 @@ fun ExpenseDetailScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
                     ) {
                         val myExpenses by vm.myExpenses.collectAsStateWithLifecycle(0.0)
                         Text(
@@ -195,12 +199,16 @@ fun ExpenseDetailScreen(
                             text = group?.let { myExpenses.prettyPrint(it.currency) }.orEmpty(),
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
+                            autoSize = TextAutoSize.StepBased(
+                                maxFontSize = MaterialTheme.typography.displaySmall.fontSize
+                            )
                         )
                     }
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
                     ) {
                         val totalExpenses by vm.totalExpenses.collectAsStateWithLifecycle(0.0)
                         Text(
@@ -211,7 +219,10 @@ fun ExpenseDetailScreen(
                             text = group?.let { totalExpenses.prettyPrint(it.currency) }.orEmpty(),
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
+                            autoSize = TextAutoSize.StepBased(
+                                maxFontSize = MaterialTheme.typography.displaySmall.fontSize
+                            )
                         )
                     }
                 }
@@ -420,9 +431,9 @@ private fun ExpensesList(
                                 onExpenseClicked(expense)
                             },
                             supportingContent = {
-                                Row(
+                                FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    itemVerticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Badge(
                                         containerColor = MaterialTheme.colorScheme.tertiary
