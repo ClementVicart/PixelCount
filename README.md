@@ -10,21 +10,28 @@
 
 # PixelCount - Expense tracking and splitting
 
-PixelCount is a **Kotlin Multiplatform** application designed to help you track and split expenses between groups of friends or colleagues. Whether you're on a ski vacation, sharing a dinner, or collaborating on a project, PixelCount makes it easy to manage who owes what and settle accounts fairly.
+PixelCount is a **Compose Multiplatform** application designed to help you track and split expenses between groups of friends or colleagues. Whether you're on a ski vacation, sharing a dinner, or collaborating on a project, PixelCount makes it easy to manage who owes what and settle accounts fairly.
+
+Built with **Material 3 Expressive** design, PixelCount combines modern, vibrant UI with powerful functionality.
 
 > [!IMPORTANT]
 > I am currently looking for iOS/MacOS developers to help me build this multiplatform app on Apple platforms. Please contact me if you're interested!
 
 ## ✨ Features
 
+### Core Features
 - 💰 **Easy Expense Tracking** - Add expenses and track who paid for what
-- 👥 **Group Management** - Create groups with friends or colleagues
-- 🧮 **Automatic Settlement** - Calculate who owes whom and how much
+- 👥 **Group Management** - Create and manage groups with friends or colleagues
+- 🧮 **Automatic Settlement** - Calculate who owes whom and how much with a single tap
+- 📊 **Expense History** - View detailed transaction history and expense breakdowns
+
+### Sharing & Sync
+- 🔄 **Real-time Sync** - Seamless synchronization between devices via Google Play Services
 - 📱 **Cross-Platform** - Use the same app on your phone, desktop, or smartwatch
 - ⌚ **WearOS Support** - Access your expenses on your smartwatch
-- 💾 **Local Storage** - Your data is stored locally on your device
-- 🔄 **Real-time Sync** - Seamless synchronization between devices via Google Play Services
-- 📊 **Expense History** - View detailed transaction history
+- 💾 **Local Storage** - Your data is stored locally on your device for privacy
+- 📤 **Group Transfer via QR Code** - Share groups with others by scanning a QR code
+- 📁 **Group Export/Import** - Transfer groups between devices or users via file export and import
 
 ## 📷 Screenshots
 
