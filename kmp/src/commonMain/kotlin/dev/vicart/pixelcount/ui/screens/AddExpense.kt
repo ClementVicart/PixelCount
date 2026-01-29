@@ -39,7 +39,6 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
@@ -56,22 +55,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.vicart.pixelcount.shared.model.Expense
-import dev.vicart.pixelcount.shared.model.ExpenseGroup
-import dev.vicart.pixelcount.shared.model.Participant
-import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add
 import dev.vicart.pixelcount.resources.add_expense
@@ -88,6 +87,10 @@ import dev.vicart.pixelcount.resources.title
 import dev.vicart.pixelcount.resources.to
 import dev.vicart.pixelcount.resources.transfer
 import dev.vicart.pixelcount.resources.type
+import dev.vicart.pixelcount.shared.model.Expense
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.model.Participant
+import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
@@ -95,7 +98,7 @@ import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     itemId: Uuid,
@@ -103,18 +106,21 @@ fun AddExpenseScreen(
     vm: AddExpenseViewModel = viewModel(key = itemId.toString()) { AddExpenseViewModel(itemId, initial) },
     onBack: () -> Unit
 ) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopBar(
-                onBack = onBack
+                onBack = onBack,
+                scrollBehavior = scrollBehavior
             )
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -302,7 +308,7 @@ fun AddExpenseScreen(
 
             if(pictureBitmap == null) {
                 OutlinedButton(
-                    onClick = vm::launchPickImage,
+                    onClick = dropUnlessResumed(block = vm::launchPickImage),
                     shapes = ButtonDefaults.shapes(
                         shape = ButtonDefaults.squareShape,
                         pressedShape = ButtonDefaults.largePressedShape
@@ -323,9 +329,9 @@ fun AddExpenseScreen(
                     Image(
                         bitmap = pictureBitmap!!,
                         contentDescription = null,
-                        modifier = Modifier.clickable {
-                            vm.launchPickImage()
-                        }
+                        modifier = Modifier.clickable(
+                            onClick = dropUnlessResumed(block = vm::launchPickImage)
+                        )
                     )
 
                     FilledTonalIconButton(
@@ -387,10 +393,6 @@ fun AddExpenseScreen(
                     shapes = ButtonDefaults.shapesFor(ButtonDefaults.MediumContainerHeight),
                     modifier = Modifier.height(ButtonDefaults.MediumContainerHeight).weight(1f),
                     contentPadding = ButtonDefaults.MediumContentPadding,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
                     enabled = canAdd
                 ) {
                     Icon(
@@ -430,7 +432,7 @@ private fun SharePaymentParticipantList(
 
         group?.participants?.filterNot { it == paidBy }?.forEach { participant ->
             val containerColor by animateColorAsState(
-                targetValue = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.primary
+                targetValue = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.surfaceContainer,
                 animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()
             )
@@ -447,22 +449,16 @@ private fun SharePaymentParticipantList(
                 headlineContent = { Text(participant.name) },
                 colors = ListItemDefaults.colors().copy(
                     containerColor = containerColor,
-                    headlineColor = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onPrimaryContainer,
-                    trailingIconColor = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onPrimaryContainer
+                    headlineColor = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.onSecondary
+                    else MaterialTheme.colorScheme.onSurface,
+                    trailingIconColor = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.onSecondary
+                    else MaterialTheme.colorScheme.onSurface
                 ),
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .selectable(selected = sharedWith?.contains(participant) == true) {
                         vm.toggleShareParticipant(participant)
                     },
-                leadingContent = {
-                    Checkbox(
-                        checked = sharedWith?.contains(participant) == true,
-                        onCheckedChange = { vm.toggleShareParticipant(participant) }
-                    )
-                },
                 trailingContent = {
                     Text(amountForParticipant)
                 }
@@ -474,12 +470,14 @@ private fun SharePaymentParticipantList(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TopBar(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
         title = { Text(stringResource(Res.string.add_expense)) },
         navigationIcon = {
             BackButton(onBack)
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }

@@ -2,6 +2,12 @@
     <img src="https://github.com/ClementVicart/PixelCount/blob/main/kmp/assets/icon-192.png?raw=true" />
 </p>
 
+<p align="center">
+    <a href="https://play.google.com/store/apps/details?id=dev.vicart.pixelcount">
+        <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/play-store-badge.png?raw=true" />
+    </a>
+</p>
+
 # PixelCount - Expense tracking and splitting
 
 PixelCount is a **Kotlin Multiplatform** application designed to help you track and split expenses between groups of friends or colleagues. Whether you're on a ski vacation, sharing a dinner, or collaborating on a project, PixelCount makes it easy to manage who owes what and settle accounts fairly.

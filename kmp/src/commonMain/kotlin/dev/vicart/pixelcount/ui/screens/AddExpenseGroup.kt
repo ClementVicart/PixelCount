@@ -34,6 +34,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -69,13 +72,16 @@ fun AddExpenseGroupScreen(
     initial: ExpenseGroup? = null,
     vm: AddExpenseGroupViewModel = viewModel { AddExpenseGroupViewModel(initial) }
 ) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         topBar = {
             TopBar(
                 onBack = onBack,
-                vm = vm
+                vm = vm,
+                scrollBehavior = scrollBehavior
             )
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) {
         Box(
             modifier = Modifier
@@ -255,7 +261,8 @@ fun AddExpenseGroupScreen(
 @Composable
 private fun TopBar(
     onBack: () -> Unit,
-    vm: AddExpenseGroupViewModel
+    vm: AddExpenseGroupViewModel,
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     MediumFlexibleTopAppBar(
         title = { Text(stringResource(Res.string.add_expense_group)) },
@@ -277,6 +284,7 @@ private fun TopBar(
             ) {
                 Icon(Icons.Default.Check, null)
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }
