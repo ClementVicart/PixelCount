@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.ide.kmp.KotlinAndroidSourceSetMarker.Companion.android
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -54,6 +55,8 @@ kotlin {
 
             implementation(libs.kotlinx.json)
             implementation(libs.kotlinx.datetime)
+
+            implementation(libs.qrcode.kotlin)
 
             api(project(":shared"))
         }

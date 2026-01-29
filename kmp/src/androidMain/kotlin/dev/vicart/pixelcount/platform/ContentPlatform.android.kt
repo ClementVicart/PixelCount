@@ -13,6 +13,8 @@ interface ContentProviderFactory {
     suspend fun deleteImage(id: Uuid)
 
     suspend fun hasImage(id: Uuid) : Boolean
+
+    suspend fun readQrCode() : String?
 }
 
 lateinit var contentProviderFactory: ContentProviderFactory
@@ -24,3 +26,7 @@ actual suspend fun writeImage(id: Uuid, data: ByteArray) = contentProviderFactor
 actual suspend fun deleteImage(id: Uuid) = contentProviderFactory.deleteImage(id)
 
 actual suspend fun hasImage(id: Uuid): Boolean = contentProviderFactory.hasImage(id)
+
+actual suspend fun readQrCode(): String? = contentProviderFactory.readQrCode()
+
+actual val canScanQrCode: Boolean = true

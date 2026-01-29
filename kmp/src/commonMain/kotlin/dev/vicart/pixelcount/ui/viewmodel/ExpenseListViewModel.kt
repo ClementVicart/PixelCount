@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dev.vicart.pixelcount.model.ErrorEnum
 import dev.vicart.pixelcount.platform.deleteImage
 import dev.vicart.pixelcount.platform.import
+import dev.vicart.pixelcount.platform.readQrCode
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.shared.service.ExpenseGroupService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class ExpenseListViewModel : ViewModel() {
 
@@ -36,6 +38,20 @@ class ExpenseListViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 errorChannel.send(ErrorEnum.IMPORT_FILE_ERROR)
+            }
+        }
+    }
+
+    fun readQrCodeGroup() {
+        viewModelScope.launch {
+            val qrCode = readQrCode()
+            if(qrCode != null) {
+                try {
+                    val group = Json.decodeFromString<ExpenseGroup>(qrCode)
+                    ExpenseGroupService.insert(group)
+                } catch (e: Exception) {
+                    errorChannel.send(ErrorEnum.READING_QR_CODE_ERROR)
+                }
             }
         }
     }

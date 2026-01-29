@@ -1,5 +1,6 @@
 package dev.vicart.pixelcount.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,18 +26,22 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,14 +49,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.vicart.pixelcount.platform.canScanQrCode
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
+import dev.vicart.pixelcount.resources.choose_file
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expense_groups
 import dev.vicart.pixelcount.resources.import
 import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.no_expense_yet
+import dev.vicart.pixelcount.resources.scan_qr_code
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseListViewModel
@@ -73,7 +84,8 @@ fun ExpenseListScreen(
         floatingActionButton = { AddExpenseGroupFab(onClick = addExpenseGroup) },
         topBar = {
             TopBar(
-                onImport = vm::importGroup
+                onImport = vm::importGroup,
+                onReadQrcode = vm::readQrCodeGroup
             )
         },
         snackbarHost = { SnackBar(vm) }
@@ -170,8 +182,10 @@ private fun AddExpenseGroupFab(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TopBar(
-    onImport: () -> Unit
+    onImport: () -> Unit,
+    onReadQrcode: () -> Unit
 ) {
+    var importBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     TopAppBar(
         title = { Text(stringResource(Res.string.expense_groups)) },
         actions = {
@@ -191,11 +205,18 @@ private fun TopBar(
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.import)) },
                         leadingIcon = { Icon(Icons.Default.Download, null) },
-                        onClick = onImport
+                        onClick = { importBottomSheetVisible = true }
                     )
                 }
             }
         }
+    )
+
+    ImportBottomSheet(
+        isVisible = importBottomSheetVisible,
+        onDismiss = { importBottomSheetVisible = false },
+        onReadQrcode = onReadQrcode,
+        onImport = onImport
     )
 }
 
@@ -213,4 +234,50 @@ private fun SnackBar(
     }
 
     SnackbarHost(state)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ImportBottomSheet(
+    isVisible: Boolean,
+    onDismiss: () -> Unit,
+    onReadQrcode: () -> Unit,
+    onImport: () -> Unit
+) {
+    if(isVisible) {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss
+        ) {
+            if(canScanQrCode) {
+                ListItem(
+                    headlineContent = {
+                        Text(stringResource(Res.string.scan_qr_code))
+                    },
+                    leadingContent = {
+                        Icon(Icons.Default.QrCodeScanner, null)
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = BottomSheetDefaults.ContainerColor,
+                        headlineColor = contentColorFor(BottomSheetDefaults.ContainerColor),
+                        leadingIconColor = contentColorFor(BottomSheetDefaults.ContainerColor)
+                    ),
+                    modifier = Modifier.clickable { onReadQrcode() }
+                )
+            }
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(Res.string.choose_file))
+                },
+                leadingContent = {
+                    Icon(Icons.Default.FileOpen, null)
+                },
+                colors = ListItemDefaults.colors(
+                    containerColor = BottomSheetDefaults.ContainerColor,
+                    headlineColor = contentColorFor(BottomSheetDefaults.ContainerColor),
+                    leadingIconColor = contentColorFor(BottomSheetDefaults.ContainerColor)
+                ),
+                modifier = Modifier.clickable { onImport() }
+            )
+        }
+    }
 }

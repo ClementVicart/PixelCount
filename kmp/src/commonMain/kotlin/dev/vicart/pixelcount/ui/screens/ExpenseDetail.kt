@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,8 +34,10 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,10 +54,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MotionScheme
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -70,25 +73,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
-import dev.vicart.pixelcount.shared.model.Expense
-import dev.vicart.pixelcount.shared.model.ExpenseGroup
-import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.balance
+import dev.vicart.pixelcount.resources.close
 import dev.vicart.pixelcount.resources.created_by
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expenses
@@ -97,16 +96,23 @@ import dev.vicart.pixelcount.resources.my_expenses
 import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
 import dev.vicart.pixelcount.resources.owes_to
+import dev.vicart.pixelcount.resources.save
 import dev.vicart.pixelcount.resources.select_or_create_a_group
 import dev.vicart.pixelcount.resources.total_expenses
 import dev.vicart.pixelcount.resources.transfer
+import dev.vicart.pixelcount.shared.model.Expense
+import dev.vicart.pixelcount.shared.model.ExpenseGroup
+import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
+import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
+import qrcode.QRCode
 import kotlin.math.abs
 import kotlin.uuid.Uuid
 
@@ -484,6 +490,8 @@ private fun TopBar(
     onDeleteExpenseGroup: () -> Unit,
     onExport: () -> Unit
 ) {
+    var exportDialogVisible by rememberSaveable { mutableStateOf(false) }
+
     TopAppBar(
         title = { Text(group?.title.orEmpty()) },
         subtitle = { Text(stringResource(Res.string.created_by, group?.participants?.firstOrNull { it.mandatory }
@@ -531,7 +539,7 @@ private fun TopBar(
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.export)) },
-                        onClick = onExport,
+                        onClick = { exportDialogVisible = true },
                         leadingIcon = { Icon(Icons.Default.Share, null) }
                     )
 
@@ -558,6 +566,15 @@ private fun TopBar(
             }
         }
     )
+
+    group?.let {
+        ExportDialog(
+            isVisible = exportDialogVisible,
+            onDismiss = { exportDialogVisible = false },
+            onExport = onExport,
+            group = it
+        )
+    }
 }
 
 @Composable
@@ -566,4 +583,53 @@ fun UnselectedExpenseGroupDetail() {
         modifier = Modifier.fillMaxSize(),
         label = { Text(stringResource(Res.string.select_or_create_a_group)) }
     )
+}
+
+@Composable
+private fun ExportDialog(
+    isVisible: Boolean,
+    group: ExpenseGroup,
+    onDismiss: () -> Unit,
+    onExport: () -> Unit
+) {
+    if(isVisible) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                Button(
+                    onClick = onExport
+                ) {
+                    Text(stringResource(Res.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismiss
+                ) {
+                    Text(stringResource(Res.string.close))
+                }
+            },
+            text = {
+                val color = MaterialTheme.colorScheme.primary
+                val data = remember(group) {
+                    Json.encodeToString(group)
+                }
+                val qrCode = remember(data) {
+                    QRCode.ofSquares()
+                        .withColor(color.toArgb())
+                        .build(data)
+                        .renderToBytes()
+                        .decodeToImageBitmap()
+                }
+
+                Image(
+                    bitmap = qrCode,
+                    contentDescription = null
+                )
+            },
+            title = {
+                Text(stringResource(Res.string.export))
+            }
+        )
+    }
 }

@@ -40,4 +40,9 @@
     <string name="export">Exporter</string>
     <string name="import">Importer</string>
     <string name="error_importing_file">Impossible d'importer le fichier. Veuillez réessayer</string>
+    <string name="save">Enregistrer</string>
+    <string name="close">Fermer</string>
+    <string name="choose_file">Choisir un fichier</string>
+    <string name="scan_qr_code">Scanner un QR code</string>
+    <string name="error_reading_qr_code">Une erreur est survenue lors de la lecture du QR code</string>
 </resources>

@@ -3,9 +3,13 @@ package dev.vicart.pixelcount.platform
 import androidx.activity.ComponentActivity
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.uuid.ExperimentalUuidApi
@@ -53,6 +57,20 @@ private class ContentProviderFactoryImpl(private val activity: ComponentActivity
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun hasImage(id: Uuid): Boolean = withContext(Dispatchers.IO) {
         File(activity.cacheDir, id.toString()).exists()
+    }
+
+    override suspend fun readQrCode(): String? {
+        val options = GmsBarcodeScannerOptions.Builder()
+            .enableAutoZoom()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build()
+
+        val scanner = GmsBarcodeScanning.getClient(activity, options)
+        return try {
+            scanner.startScan().await().rawValue
+        } catch (e: Exception) {
+            null
+        }
     }
 
 }
