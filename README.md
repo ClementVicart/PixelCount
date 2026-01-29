@@ -12,6 +12,9 @@
 
 PixelCount is a **Kotlin Multiplatform** application designed to help you track and split expenses between groups of friends or colleagues. Whether you're on a ski vacation, sharing a dinner, or collaborating on a project, PixelCount makes it easy to manage who owes what and settle accounts fairly.
 
+> [!IMPORTANT]
+> I am currently looking for iOS/MacOS developers to help me build this multiplatform app on Apple platforms. Please contact me if you're interested!
+
 ## ✨ Features
 
 - 💰 **Easy Expense Tracking** - Add expenses and track who paid for what
