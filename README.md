@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://play.google.com/store/apps/details?id=dev.vicart.pixelcount">
-        <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/play-store-badge.png?raw=true" width="100" />
+        <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/play-store-badge.png?raw=true" width="192" />
     </a>
 </p>
 
