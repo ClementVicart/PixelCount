@@ -6,7 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
@@ -34,10 +35,8 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,9 +54,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -73,7 +72,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
@@ -84,10 +82,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.window.core.layout.WindowSizeClass
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.balance
-import dev.vicart.pixelcount.resources.close
 import dev.vicart.pixelcount.resources.created_by
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expenses
@@ -96,10 +94,10 @@ import dev.vicart.pixelcount.resources.my_expenses
 import dev.vicart.pixelcount.resources.no_balance_required
 import dev.vicart.pixelcount.resources.no_expense_yet
 import dev.vicart.pixelcount.resources.owes_to
-import dev.vicart.pixelcount.resources.save
 import dev.vicart.pixelcount.resources.select_or_create_a_group
 import dev.vicart.pixelcount.resources.total_expenses
 import dev.vicart.pixelcount.resources.transfer
+import dev.vicart.pixelcount.resources.we_owe_you
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
@@ -107,12 +105,10 @@ import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
+import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
-import kotlinx.serialization.json.Json
-import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
-import qrcode.QRCode
 import kotlin.math.abs
 import kotlin.uuid.Uuid
 
@@ -238,7 +234,13 @@ fun ExpenseDetailScreen(
             NewPaymentFab(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .safeContentPadding(),
+                    .safeContentPadding()
+                    .then(with(LocalSharedTransitionScope.current) {
+                        Modifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState("new_payment_fab"),
+                            animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                        )
+                    }),
                 onClick = onAddExpense
             )
         }
@@ -324,16 +326,45 @@ private fun BalanceList(
 ) {
     val balances by vm.balances.collectAsStateWithLifecycle(emptyList())
 
-    if(balances.isEmpty() || group == null) {
-        EmptyContent(
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(Res.string.no_balance_required)) }
-        )
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.we_owe_you),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    val owesToUser by vm.owesToUser.collectAsStateWithLifecycle(0.0)
+
+                    Text(
+                        text = group?.let { owesToUser.prettyPrint(it.currency) }.orEmpty(),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+
+        if(balances.isEmpty() || group == null) {
+            item {
+                EmptyContent(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(Res.string.no_balance_required)) }
+                )
+            }
+        } else {
             items(balances, key = { it.hashCode() }) {
                 ListItem(
                     headlineContent = {
@@ -451,7 +482,11 @@ private fun ExpensesList(
                                     )
                                     expense.sharedWith.forEach { participant ->
                                         Badge(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                                            containerColor = Color.Transparent,
+                                            modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.outline,
+                                                CircleShape
+                                            ),
+                                            contentColor = MaterialTheme.colorScheme.tertiary
                                         ) {
                                             Text(participant.name)
                                         }
@@ -490,8 +525,6 @@ private fun TopBar(
     onDeleteExpenseGroup: () -> Unit,
     onExport: () -> Unit
 ) {
-    var exportDialogVisible by rememberSaveable { mutableStateOf(false) }
-
     TopAppBar(
         title = { Text(group?.title.orEmpty()) },
         subtitle = { Text(stringResource(Res.string.created_by, group?.participants?.firstOrNull { it.mandatory }
@@ -539,7 +572,7 @@ private fun TopBar(
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.export)) },
-                        onClick = { exportDialogVisible = true },
+                        onClick = onExport,
                         leadingIcon = { Icon(Icons.Default.Share, null) }
                     )
 
@@ -566,15 +599,6 @@ private fun TopBar(
             }
         }
     )
-
-    group?.let {
-        ExportDialog(
-            isVisible = exportDialogVisible,
-            onDismiss = { exportDialogVisible = false },
-            onExport = onExport,
-            group = it
-        )
-    }
 }
 
 @Composable
@@ -583,53 +607,4 @@ fun UnselectedExpenseGroupDetail() {
         modifier = Modifier.fillMaxSize(),
         label = { Text(stringResource(Res.string.select_or_create_a_group)) }
     )
-}
-
-@Composable
-private fun ExportDialog(
-    isVisible: Boolean,
-    group: ExpenseGroup,
-    onDismiss: () -> Unit,
-    onExport: () -> Unit
-) {
-    if(isVisible) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                Button(
-                    onClick = onExport
-                ) {
-                    Text(stringResource(Res.string.save))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = onDismiss
-                ) {
-                    Text(stringResource(Res.string.close))
-                }
-            },
-            text = {
-                val color = MaterialTheme.colorScheme.primary
-                val data = remember(group) {
-                    Json.encodeToString(group)
-                }
-                val qrCode = remember(data) {
-                    QRCode.ofSquares()
-                        .withColor(color.toArgb())
-                        .build(data)
-                        .renderToBytes()
-                        .decodeToImageBitmap()
-                }
-
-                Image(
-                    bitmap = qrCode,
-                    contentDescription = null
-                )
-            },
-            title = {
-                Text(stringResource(Res.string.export))
-            }
-        )
-    }
 }

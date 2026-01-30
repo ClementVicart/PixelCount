@@ -2,6 +2,7 @@ package dev.vicart.pixelcount.ui.transition
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MotionScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation3.scene.Scene
 
@@ -72,3 +74,5 @@ fun rememberMaterialTransition(
         MaterialTransition(animationSpec)
     }
 }
+
+val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope> { throw IllegalStateException("No transition scope provided") }

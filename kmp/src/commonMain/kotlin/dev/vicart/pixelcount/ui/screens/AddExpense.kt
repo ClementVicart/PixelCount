@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add
 import dev.vicart.pixelcount.resources.add_expense
@@ -94,6 +95,7 @@ import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
+import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
@@ -115,6 +117,12 @@ fun AddExpenseScreen(
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .then(with(LocalSharedTransitionScope.current) {
+                Modifier.sharedBounds(
+                    sharedContentState = rememberSharedContentState("new_payment_fab"),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                )
+            })
     ) {
         Column(
             modifier = Modifier

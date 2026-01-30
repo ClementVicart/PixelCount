@@ -41,18 +41,4 @@ class ExpenseListViewModel : ViewModel() {
             }
         }
     }
-
-    fun readQrCodeGroup() {
-        viewModelScope.launch {
-            val qrCode = readQrCode()
-            if(qrCode != null) {
-                try {
-                    val group = Json.decodeFromString<ExpenseGroup>(qrCode)
-                    ExpenseGroupService.insert(group)
-                } catch (e: Exception) {
-                    errorChannel.send(ErrorEnum.READING_QR_CODE_ERROR)
-                }
-            }
-        }
-    }
 }

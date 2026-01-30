@@ -37,6 +37,10 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
     val balances = expenseGroup.filterNotNull().mapLatest(::BalanceCalculatorService)
         .mapLatest(BalanceCalculatorService::calculateBalance)
 
+    val owesToUser = balances.mapLatest {
+        it.filter { it.to.mandatory }.sumOf { it.amount }
+    }
+
     val availableExpenseImage = expenses.mapLatest {
         it.flatMap { it.value }.filter { hasImage(it.id) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())

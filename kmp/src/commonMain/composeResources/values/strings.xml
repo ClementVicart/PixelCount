@@ -40,9 +40,5 @@
     <string name="export">Export</string>
     <string name="import">Import</string>
     <string name="error_importing_file">Error while importing file. Please try again</string>
-    <string name="save">Save</string>
-    <string name="close">Close</string>
-    <string name="choose_file">Choose a file</string>
-    <string name="scan_qr_code">Scan QR Code</string>
-    <string name="error_reading_qr_code">Error occurred while reading QR code</string>
+    <string name="we_owe_you">People owe you</string>
 </resources>

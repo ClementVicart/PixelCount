@@ -49,19 +49,19 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.vicart.pixelcount.platform.canScanQrCode
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
-import dev.vicart.pixelcount.resources.choose_file
 import dev.vicart.pixelcount.resources.delete
 import dev.vicart.pixelcount.resources.expense_groups
 import dev.vicart.pixelcount.resources.import
 import dev.vicart.pixelcount.resources.modify
 import dev.vicart.pixelcount.resources.no_expense_yet
-import dev.vicart.pixelcount.resources.scan_qr_code
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
+import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseListViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -84,8 +84,7 @@ fun ExpenseListScreen(
         floatingActionButton = { AddExpenseGroupFab(onClick = addExpenseGroup) },
         topBar = {
             TopBar(
-                onImport = vm::importGroup,
-                onReadQrcode = vm::readQrCodeGroup
+                onImport = vm::importGroup
             )
         },
         snackbarHost = { SnackBar(vm) }
@@ -175,17 +174,21 @@ private fun AddExpenseGroupFab(
         text = { Text(stringResource(Res.string.add_expense_group)) },
         onClick = onClick,
         expanded = true,
-        icon = { Icon(Icons.Default.Add, null) }
+        icon = { Icon(Icons.Default.Add, null) },
+        modifier = with(LocalSharedTransitionScope.current) {
+            Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState("new_expense_group"),
+                animatedVisibilityScope = LocalNavAnimatedContentScope.current
+            )
+        }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TopBar(
-    onImport: () -> Unit,
-    onReadQrcode: () -> Unit
+    onImport: () -> Unit
 ) {
-    var importBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     TopAppBar(
         title = { Text(stringResource(Res.string.expense_groups)) },
         actions = {
@@ -205,18 +208,11 @@ private fun TopBar(
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.import)) },
                         leadingIcon = { Icon(Icons.Default.Download, null) },
-                        onClick = { importBottomSheetVisible = true }
+                        onClick = onImport
                     )
                 }
             }
         }
-    )
-
-    ImportBottomSheet(
-        isVisible = importBottomSheetVisible,
-        onDismiss = { importBottomSheetVisible = false },
-        onReadQrcode = onReadQrcode,
-        onImport = onImport
     )
 }
 
@@ -234,50 +230,4 @@ private fun SnackBar(
     }
 
     SnackbarHost(state)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ImportBottomSheet(
-    isVisible: Boolean,
-    onDismiss: () -> Unit,
-    onReadQrcode: () -> Unit,
-    onImport: () -> Unit
-) {
-    if(isVisible) {
-        ModalBottomSheet(
-            onDismissRequest = onDismiss
-        ) {
-            if(canScanQrCode) {
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(Res.string.scan_qr_code))
-                    },
-                    leadingContent = {
-                        Icon(Icons.Default.QrCodeScanner, null)
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = BottomSheetDefaults.ContainerColor,
-                        headlineColor = contentColorFor(BottomSheetDefaults.ContainerColor),
-                        leadingIconColor = contentColorFor(BottomSheetDefaults.ContainerColor)
-                    ),
-                    modifier = Modifier.clickable { onReadQrcode() }
-                )
-            }
-            ListItem(
-                headlineContent = {
-                    Text(stringResource(Res.string.choose_file))
-                },
-                leadingContent = {
-                    Icon(Icons.Default.FileOpen, null)
-                },
-                colors = ListItemDefaults.colors(
-                    containerColor = BottomSheetDefaults.ContainerColor,
-                    headlineColor = contentColorFor(BottomSheetDefaults.ContainerColor),
-                    leadingIconColor = contentColorFor(BottomSheetDefaults.ContainerColor)
-                ),
-                modifier = Modifier.clickable { onImport() }
-            )
-        }
-    }
 }

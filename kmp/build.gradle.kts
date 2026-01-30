@@ -56,8 +56,6 @@ kotlin {
             implementation(libs.kotlinx.json)
             implementation(libs.kotlinx.datetime)
 
-            implementation(libs.qrcode.kotlin)
-
             api(project(":shared"))
         }
 

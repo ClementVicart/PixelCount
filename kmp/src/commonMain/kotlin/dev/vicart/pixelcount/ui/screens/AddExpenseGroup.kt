@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.resources.Res
 import dev.vicart.pixelcount.resources.add_expense_group
@@ -62,6 +63,7 @@ import dev.vicart.pixelcount.resources.you
 import dev.vicart.pixelcount.resources.your_name
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.EmojiPicker
+import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseGroupViewModel
 import org.jetbrains.compose.resources.stringResource
 
@@ -81,7 +83,14 @@ fun AddExpenseGroupScreen(
                 scrollBehavior = scrollBehavior
             )
         },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).then(
+            with(LocalSharedTransitionScope.current) {
+                Modifier.sharedBounds(
+                    sharedContentState = rememberSharedContentState("new_expense_group"),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                )
+            }
+        )
     ) {
         Box(
             modifier = Modifier
