@@ -121,6 +121,9 @@ fun AddExpenseScreen(
                 Modifier.sharedBounds(
                     sharedContentState = rememberSharedContentState("new_payment_fab"),
                     animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                ).sharedBounds(
+                    sharedContentState = rememberSharedContentState("expense_item_${initial?.id}"),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
                 )
             })
     ) {

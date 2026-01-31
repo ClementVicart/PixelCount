@@ -42,9 +42,3 @@ actual suspend fun deleteImage(id: Uuid) = withContext(Dispatchers.IO) {
 actual suspend fun hasImage(id: Uuid): Boolean = withContext(Dispatchers.IO) {
     File(cacheDirectory.absolutePathString(), id.toString()).exists()
 }
-
-actual suspend fun readQrCode(): String? {
-    throw UnsupportedOperationException("Cannot read QR code on JVM")
-}
-
-actual val canScanQrCode: Boolean = false

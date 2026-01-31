@@ -1,7 +1,7 @@
 [versions]
 # Kotlin
 kotlin = "2.3.0"
-serialization = "1.9.0"
+serialization = "1.10.0"
 coroutines = "1.10.2"
 datetime = "0.7.1"
 
@@ -9,7 +9,7 @@ datetime = "0.7.1"
 agp = "9.0.0"
 compileSdk = "36"
 minSdk = "30"
-activity = "1.12.2"
+activity = "1.12.3"
 material = "1.13.0"
 
 # Compose
@@ -26,7 +26,6 @@ compose-wear = "1.5.6"
 
 # GMS
 play-services-wearable = "19.0.0"
-play-services-code-scanner = "16.1.0"
 
 # Data
 sqldelight = "2.2.1"
@@ -57,7 +56,6 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
-play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "play-services-code-scanner" }
 
 # WearOS
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "compose-wear" }

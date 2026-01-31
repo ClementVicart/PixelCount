@@ -111,7 +111,9 @@ fun App() = AppTheme {
                             initial = it.item
                         )
                     }
-                    entry<Screens.AddExpense> {
+                    entry<Screens.AddExpense>(
+                        metadata = transitionAxisMetadata(TransitionAxis.Y)
+                    ) {
                         AddExpenseScreen(
                             onBack = {
                                 backStack.remove(it)

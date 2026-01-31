@@ -137,12 +137,17 @@ fun ExpenseDetailScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        var animateExpenseItem by rememberSaveable { mutableStateOf(false) }
         BottomSheetScaffold(
             sheetContent = {
                 DetailSheetContent(
                     vm = vm,
                     group = group,
-                    onExpenseClicked = onEditExpense
+                    onExpenseClicked = {
+                        animateExpenseItem = true
+                        onEditExpense(it)
+                    },
+                    animateExpenseItem = animateExpenseItem
                 )
             },
             topBar = {
@@ -240,8 +245,11 @@ fun ExpenseDetailScreen(
                             sharedContentState = rememberSharedContentState("new_payment_fab"),
                             animatedVisibilityScope = LocalNavAnimatedContentScope.current
                         )
-                    }),
-                onClick = onAddExpense
+                    }.takeIf { !animateExpenseItem } ?: Modifier),
+                onClick = {
+                    animateExpenseItem = false
+                    onAddExpense()
+                }
             )
         }
     }
@@ -270,7 +278,8 @@ private fun NewPaymentFab(
 private fun DetailSheetContent(
     vm: ExpenseDetailViewModel,
     group: ExpenseGroup?,
-    onExpenseClicked: (Expense) -> Unit
+    onExpenseClicked: (Expense) -> Unit,
+    animateExpenseItem: Boolean
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -306,7 +315,8 @@ private fun DetailSheetContent(
                 ExpensesList(
                     onExpenseClicked = onExpenseClicked,
                     group = group,
-                    vm = vm
+                    vm = vm,
+                    animateItem = animateExpenseItem
                 )
             } else {
                 BalanceList(
@@ -413,7 +423,8 @@ private fun ExpensesList(
     modifier: Modifier = Modifier,
     group: ExpenseGroup?,
     vm: ExpenseDetailViewModel,
-    onExpenseClicked: (Expense) -> Unit
+    onExpenseClicked: (Expense) -> Unit,
+    animateItem: Boolean
 ) {
     if(group?.expenses.isNullOrEmpty()) {
         EmptyContent(
@@ -465,7 +476,12 @@ private fun ExpensesList(
                             },
                             modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
                                 onExpenseClicked(expense)
-                            },
+                            }.then(with(LocalSharedTransitionScope.current) {
+                                Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState("expense_item_${expense.id}"),
+                                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                                )
+                            }.takeIf { animateItem } ?: Modifier),
                             supportingContent = {
                                 FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
