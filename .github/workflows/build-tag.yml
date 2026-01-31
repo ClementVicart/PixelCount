@@ -108,7 +108,7 @@ jobs:
           releaseFiles: 'pixelcount-android/androidApp-release.aab'
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
           packageName: dev.vicart.pixelcount
-          track: qa
+          track: internal
           status: draft
 
       - name: Publish WearOS to Play Store
@@ -117,5 +117,5 @@ jobs:
           releaseFiles: 'pixelcount-wearos/wearosApp-release.aab'
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
           packageName: dev.vicart.pixelcount
-          track: wear:qa
+          track: wear:internal
           status: draft
