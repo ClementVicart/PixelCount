@@ -36,10 +36,10 @@ Built with **Material 3 Expressive** design, PixelCount combines modern, vibrant
 ## 📷 Screenshots
 
 <p align="center">
-  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221927.png?raw=true" width="150"/>
-  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221936.png?raw=true" width="150"/>
-  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221942.png?raw=true" width="150"/>
-  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot_20260123_221947.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot-1.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot-2.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot-3.png?raw=true" width="150"/>
+  <img src="https://github.com/ClementVicart/PixelCount/blob/main/docs/Screenshot-4.png?raw=true" width="150"/>
 </p>
 
 ## 🚀 Platforms
