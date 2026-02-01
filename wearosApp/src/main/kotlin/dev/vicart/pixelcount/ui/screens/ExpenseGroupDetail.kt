@@ -38,9 +38,7 @@ fun ExpenseGroupDetailScreen(
     id: Uuid,
     vm: ExpenseGroupDetailViewModel = viewModel(key = id.toString()) { ExpenseGroupDetailViewModel(id) }
 ) {
-    val scalingState = rememberScalingLazyListState(
-        initialCenterItemIndex = 0
-    )
+    val scalingState = rememberScalingLazyListState()
 
     ScreenScaffold(
         scrollState = scalingState

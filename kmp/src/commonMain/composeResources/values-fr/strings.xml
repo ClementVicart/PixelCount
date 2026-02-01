@@ -19,7 +19,6 @@
     <string name="add_expense">Ajouter une dépense</string>
     <string name="owes_to">doit à</string>
     <string name="no_balance_required">Pas d'équilibre à afficher</string>
-    <string name="type">Type</string>
     <string name="payment">Paiement</string>
     <string name="refund">Remboursement</string>
     <string name="transfer">Transfert</string>

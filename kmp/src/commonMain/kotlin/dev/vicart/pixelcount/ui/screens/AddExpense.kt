@@ -52,6 +52,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TopAppBar
@@ -87,7 +88,6 @@ import dev.vicart.pixelcount.resources.share_with
 import dev.vicart.pixelcount.resources.title
 import dev.vicart.pixelcount.resources.to
 import dev.vicart.pixelcount.resources.transfer
-import dev.vicart.pixelcount.resources.type
 import dev.vicart.pixelcount.shared.model.Expense
 import dev.vicart.pixelcount.shared.model.ExpenseGroup
 import dev.vicart.pixelcount.shared.model.Participant
@@ -136,11 +136,6 @@ fun AddExpenseScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val group by vm.expenseGroup.collectAsStateWithLifecycle()
-
-            Text(
-                text = stringResource(Res.string.type),
-                style = MaterialTheme.typography.titleMedium
-            )
 
             val paymentType by vm.paymentType.collectAsStateWithLifecycle()
 
@@ -219,7 +214,7 @@ fun AddExpenseScreen(
             ) {
                 val title by vm.title.collectAsStateWithLifecycle()
 
-                OutlinedTextField(
+                TextField(
                     value = title,
                     onValueChange = { vm.title.value = it },
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -230,7 +225,7 @@ fun AddExpenseScreen(
 
             val amount by vm.amount.collectAsStateWithLifecycle()
 
-            OutlinedTextField(
+            TextField(
                 value = amount,
                 onValueChange = {
                     if(it.isEmpty()) {
