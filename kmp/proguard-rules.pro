@@ -1,0 +1,3 @@
+-dontwarn org.sqlite.util.LoggerFactory$SLF4JLogger
+-keep class org.sqlite.** { *; }
+-keep interface org.sqlite.** { *; }

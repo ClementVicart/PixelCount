@@ -82,7 +82,8 @@ compose.desktop {
         buildTypes {
             release {
                 proguard {
-                    isEnabled = false
+                    version = "7.8.2"
+                    configurationFiles = files("proguard-rules.pro")
                 }
             }
         }
