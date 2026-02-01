@@ -10,11 +10,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.FilledTonalButton
+import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -30,8 +33,7 @@ fun ExpenseGroupListScreen(
     vm: ExpenseGroupListViewModel = viewModel(),
     navigateToExpenseGroup: (Uuid) -> Unit
 ) {
-    val state = rememberTransformingLazyColumnState()
-    val transformationSpec = rememberTransformationSpec()
+    val state = rememberScalingLazyListState()
 
     ScreenScaffold(
         scrollState = state
@@ -39,11 +41,17 @@ fun ExpenseGroupListScreen(
 
         val expenseGroups by vm.expenseGroups.collectAsStateWithLifecycle()
 
-        TransformingLazyColumn(
+        ScalingLazyColumn(
             state = state,
             contentPadding = it,
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+            modifier = Modifier.fillMaxSize()
         ) {
+            item {
+                ListHeader {
+                    Text("Groups")
+                }
+            }
             if(expenseGroups.isEmpty()) {
                 item {
                     Text(
@@ -64,7 +72,7 @@ fun ExpenseGroupListScreen(
                                 }
                             )
                         },
-                        modifier = Modifier.fillMaxSize().transformedHeight(this, transformationSpec)
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }

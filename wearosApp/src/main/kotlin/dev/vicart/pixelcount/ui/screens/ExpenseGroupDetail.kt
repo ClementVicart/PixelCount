@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,6 +16,7 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListSubHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -36,7 +38,9 @@ fun ExpenseGroupDetailScreen(
     id: Uuid,
     vm: ExpenseGroupDetailViewModel = viewModel(key = id.toString()) { ExpenseGroupDetailViewModel(id) }
 ) {
-    val scalingState = rememberScalingLazyListState()
+    val scalingState = rememberScalingLazyListState(
+        initialCenterItemIndex = 0
+    )
 
     ScreenScaffold(
         scrollState = scalingState
@@ -51,10 +55,19 @@ fun ExpenseGroupDetailScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             item {
-                Text(
-                    text = group?.title ?: "",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                ListHeader {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = group?.emoji.orEmpty()
+                        )
+                        Text(
+                            text = group?.title ?: ""
+                        )
+                    }
+                }
             }
 
             item {
@@ -62,9 +75,11 @@ fun ExpenseGroupDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ListHeader {
+                    ListSubHeader {
                         Text(
-                            text = stringResource(R.string.my_expenses)
+                            text = stringResource(R.string.my_expenses),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
@@ -82,9 +97,11 @@ fun ExpenseGroupDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ListHeader {
+                    ListSubHeader {
                         Text(
-                            text = stringResource(R.string.total_expenses)
+                            text = stringResource(R.string.total_expenses),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
@@ -98,8 +115,12 @@ fun ExpenseGroupDetailScreen(
             }
 
             item {
-                ListHeader {
-                    Text(stringResource(R.string.expenses))
+                ListSubHeader {
+                    Text(
+                        text = stringResource(R.string.expenses),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 
