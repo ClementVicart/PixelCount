@@ -105,8 +105,6 @@ import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ConfirmDeleteGroupExpenseDialog
 import dev.vicart.pixelcount.ui.components.EmptyContent
-import dev.vicart.pixelcount.ui.theme.mono
-import dev.vicart.pixelcount.ui.theme.notoSansMono
 import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
@@ -197,9 +195,7 @@ fun ExpenseDetailScreen(
                         )
                         Text(
                             text = group?.let { myExpenses.prettyPrint(it.currency) }.orEmpty(),
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontFamily = notoSansMono
-                            ),
+                            style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary,
                             autoSize = TextAutoSize.StepBased(
@@ -219,9 +215,7 @@ fun ExpenseDetailScreen(
                         )
                         Text(
                             text = group?.let { totalExpenses.prettyPrint(it.currency) }.orEmpty(),
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontFamily = notoSansMono
-                            ),
+                            style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.secondary,
                             autoSize = TextAutoSize.StepBased(
@@ -365,9 +359,7 @@ private fun BalanceList(
 
                     Text(
                         text = group?.let { owesToUser.prettyPrint(it.currency) }.orEmpty(),
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontFamily = notoSansMono
-                        ),
+                        style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -395,10 +387,7 @@ private fun BalanceList(
                                 withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                                     append(" ${it.to.name} ")
                                 }
-                                withStyle(MaterialTheme.typography.mono.toSpanStyle().copy(
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    fontWeight = FontWeight.SemiBold
-                                )) {
+                                withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.SemiBold)) {
                                     append(it.amount.prettyPrint(group.currency))
                                 }
                             }
@@ -474,8 +463,7 @@ private fun ExpensesList(
                                         PaymentTypeEnum.PAYMENT -> MaterialTheme.colorScheme.error
                                         PaymentTypeEnum.REFUND -> Color.Green
                                         else -> LocalContentColor.current
-                                    },
-                                    style = MaterialTheme.typography.mono
+                                    }
                                 )
                             },
                             overlineContent = {

@@ -1,15 +1,12 @@
 package dev.vicart.pixelcount.ui.theme
 
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import dev.vicart.pixelcount.resources.GoogleSans
-import dev.vicart.pixelcount.resources.NotoSansMono
 import dev.vicart.pixelcount.resources.Res
 import org.jetbrains.compose.resources.Font
 
@@ -42,24 +39,6 @@ private val googleFontFamily: FontFamily
         )
     )
 
-val notoSansMono: FontFamily
-    @Composable get() = FontFamily(
-        Font(
-            resource = Res.font.NotoSansMono,
-            variationSettings = FontVariation.Settings(
-                weight = FontWeight.Normal,
-                style = FontStyle.Normal
-            )
-        ),
-        Font(
-            resource = Res.font.NotoSansMono,
-            variationSettings = FontVariation.Settings(
-                weight = FontWeight.SemiBold,
-                style = FontStyle.Normal
-            )
-        )
-    )
-
 val typography: Typography
     @Composable get() = Typography(
         displayLarge = baseTypography.displayLarge.copy(fontFamily = googleFontFamily),
@@ -77,9 +56,4 @@ val typography: Typography
         labelLarge = baseTypography.labelLarge.copy(fontFamily = googleFontFamily),
         labelMedium = baseTypography.labelMedium.copy(fontFamily = googleFontFamily),
         labelSmall = baseTypography.labelSmall.copy(fontFamily = googleFontFamily)
-    )
-
-val Typography.mono: TextStyle
-    @Composable get() = LocalTextStyle.current.copy(
-        fontFamily = notoSansMono
     )
