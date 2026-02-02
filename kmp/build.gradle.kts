@@ -83,7 +83,7 @@ compose.desktop {
             release {
                 proguard {
                     version = "7.8.2"
-                    configurationFiles = files("proguard-rules.pro")
+                    configurationFiles = layout.projectDirectory.files("proguard-rules.pro")
                 }
             }
         }
