@@ -95,6 +95,7 @@ import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
+import dev.vicart.pixelcount.ui.theme.mono
 import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
 import org.jetbrains.compose.resources.stringResource
@@ -249,7 +250,8 @@ fun AddExpenseScreen(
                         fontSize = with(LocalDensity.current) { 24.dp.toSp() },
                         fontWeight = FontWeight.Bold
                     )
-                }
+                },
+                textStyle = MaterialTheme.typography.mono
             )
 
             Text(
@@ -466,7 +468,10 @@ private fun SharePaymentParticipantList(
                         vm.toggleShareParticipant(participant)
                     },
                 trailingContent = {
-                    Text(amountForParticipant)
+                    Text(
+                        text = amountForParticipant,
+                        style = MaterialTheme.typography.mono
+                    )
                 }
             )
         }
