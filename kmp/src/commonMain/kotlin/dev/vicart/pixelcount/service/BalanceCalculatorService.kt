@@ -6,6 +6,7 @@ import dev.vicart.pixelcount.shared.model.Participant
 import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.collections.forEach
 
 class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
 
@@ -60,6 +61,38 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
             }
         }
 
-        finalBalances
+        eliminateTransitiveBalances(finalBalances)
+    }
+
+    private fun eliminateTransitiveBalances(balances: List<Balance>): List<Balance> {
+        val result = mutableListOf<Balance>()
+
+        val participantsNet = buildMap {
+            balances.forEach { balance ->
+                put(balance.from, getOrElse(balance.from) { 0.0 } - balance.amount)
+                put(balance.to, getOrElse(balance.to) { 0.0 } + balance.amount)
+            }
+        }
+
+        val debtors = participantsNet.filter { it.value < 0.0 }.map { it.key to -it.value }.toMutableList()
+        val creditors = participantsNet.filter { it.value > 0.0 }.map { it.key to it.value }.toMutableList()
+
+        while(debtors.isNotEmpty() && creditors.isNotEmpty()) {
+            val debitor = debtors.removeAt(0)
+            val creditor = creditors.removeAt(0)
+
+            val transferAmount = minOf(debitor.second, creditor.second)
+
+            result.add(Balance(debitor.first, creditor.first, transferAmount))
+
+            if(debitor.second - transferAmount > 0.0) {
+                debtors.add(debitor.first to debitor.second - transferAmount)
+            }
+            if(creditor.second - transferAmount > 0.0) {
+                creditors.add(creditor.first to creditor.second - transferAmount)
+            }
+        }
+
+        return result
     }
 }
