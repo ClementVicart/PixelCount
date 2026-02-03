@@ -1,13 +1,12 @@
 package dev.vicart.pixelcount.ui
 
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.withCompositionLocal
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -15,6 +14,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import dev.vicart.pixelcount.ui.navigation.LocalDeeplinkUriPath
 import dev.vicart.pixelcount.ui.screens.AddExpenseGroupScreen
 import dev.vicart.pixelcount.ui.screens.AddExpenseScreen
 import dev.vicart.pixelcount.ui.screens.ExpenseDetailScreen
@@ -29,6 +29,7 @@ import dev.vicart.pixelcount.ui.transition.transitionAxisMetadata
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -47,6 +48,16 @@ fun App() = AppTheme {
         },
         Screens.Expense.List
     )
+
+    val deepLinkUri = LocalDeeplinkUriPath.current
+    LaunchedEffect(deepLinkUri) {
+        if(deepLinkUri?.startsWith("/group/") == true) {
+            try {
+                val groupId = Uuid.parse(deepLinkUri.substringAfter("/group/"))
+                backStack.add(Screens.Expense.Detail(groupId))
+            } catch (_: Exception) {}
+        }
+    }
 
     val materialTransition = rememberMaterialTransition()
 

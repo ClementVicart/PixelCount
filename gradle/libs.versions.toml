@@ -23,6 +23,7 @@ qrcode = "4.5.0"
 
 # Compose Wear
 compose-wear = "1.5.6"
+phone-interaction = "1.1.0"
 
 # GMS
 play-services-wearable = "19.0.0"
@@ -62,6 +63,7 @@ wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation",
 wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "compose-wear" }
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "compose-wear" }
 play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "play-services-wearable" }
+wear-remote-interactions = { module = "androidx.wear:wear-remote-interactions", version.ref = "phone-interaction" }
 
 
 [plugins]

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.AddCard
+import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -376,15 +378,18 @@ private fun BalanceList(
             }
         } else {
             items(balances, key = { it.hashCode() }) {
+                Card {
+
+                }
                 ListItem(
                     headlineContent = {
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
                                     append("${it.from.name} ")
                                 }
                                 append(stringResource(Res.string.owes_to))
-                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
                                     append(" ${it.to.name} ")
                                 }
                                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.SemiBold)) {
@@ -510,7 +515,7 @@ private fun ExpensesList(
                                 }
                             },
                             trailingContent = (@Composable {
-                                Icon(Icons.Default.Image, null)
+                                Icon(Icons.Default.Attachment, null)
                             }).takeIf { expansesContainingImage.contains(expense) },
                             leadingContent = {
                                 Icon(

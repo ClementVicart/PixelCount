@@ -331,7 +331,9 @@ fun AddExpenseScreen(
                     Text(stringResource(Res.string.add_photo))
                 }
             } else {
-                Box {
+                Box(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
                     Image(
                         bitmap = pictureBitmap!!,
                         contentDescription = null,
@@ -467,7 +469,8 @@ private fun SharePaymentParticipantList(
                     },
                 trailingContent = {
                     Text(
-                        text = amountForParticipant
+                        text = amountForParticipant,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             )

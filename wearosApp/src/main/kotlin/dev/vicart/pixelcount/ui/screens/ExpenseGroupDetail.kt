@@ -3,24 +3,39 @@ package dev.vicart.pixelcount.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhonelinkRing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material3.FilledTonalIconButton
+import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.IconButton
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ListSubHeader
 import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.OpenOnPhoneDialog
+import androidx.wear.compose.material3.OpenOnPhoneDialogDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
+import androidx.wear.compose.material3.openOnPhoneDialogCurvedText
 import dev.vicart.pixelcount.R
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseGroupDetailViewModel
@@ -36,7 +51,9 @@ import kotlin.uuid.Uuid
 @Composable
 fun ExpenseGroupDetailScreen(
     id: Uuid,
-    vm: ExpenseGroupDetailViewModel = viewModel(key = id.toString()) { ExpenseGroupDetailViewModel(id) }
+    vm: ExpenseGroupDetailViewModel = viewModel(key = id.toString()) {
+        ExpenseGroupDetailViewModel(get(ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY)!!, id)
+    }
 ) {
     val scalingState = rememberScalingLazyListState(
         initialCenterItemIndex = 0
@@ -138,6 +155,32 @@ fun ExpenseGroupDetailScreen(
                             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)))
                     }
                 )
+            }
+
+            item {
+                val text = OpenOnPhoneDialogDefaults.text
+                val style = OpenOnPhoneDialogDefaults.curvedTextStyle
+                var openOnPhoneVisible by remember { mutableStateOf(false) }
+                OpenOnPhoneDialog(
+                    visible = openOnPhoneVisible,
+                    onDismissRequest = { openOnPhoneVisible = false },
+                    curvedText = {
+                        openOnPhoneDialogCurvedText(
+                            text, style
+                        )
+                    }
+                )
+                FilledTonalIconButton(
+                    onClick = {
+                        openOnPhoneVisible = true
+                        vm.openOnPhone()
+                    },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    OpenOnPhoneDialogDefaults.Icon(
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }

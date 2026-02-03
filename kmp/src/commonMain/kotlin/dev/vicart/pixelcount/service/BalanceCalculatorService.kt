@@ -33,35 +33,7 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
             }
         }
 
-        val finalBalances = mutableListOf<Balance>()
-        val processedBalances = mutableListOf<Balance>()
-
-        balances.forEach { balance ->
-            if(balance in processedBalances) return@forEach
-
-            val reciprocal = balances.find { it.from == balance.to && it.to == balance.from }
-
-            if(reciprocal != null) {
-                processedBalances.add(balance)
-                processedBalances.add(reciprocal)
-
-                val diff = balance.amount - reciprocal.amount
-                when {
-                    diff > 0 -> finalBalances.add(Balance(balance.from, balance.to, diff))
-                    diff < 0 -> finalBalances.add(Balance(reciprocal.from, reciprocal.to, -diff))
-                }
-            } else {
-                if(balance.amount > 0.0) {
-                    finalBalances.add(balance)
-                } else if(balance.amount < 0.0) {
-                    balance.also {
-                        finalBalances.add(Balance(it.to, it.from, -it.amount))
-                    }
-                }
-            }
-        }
-
-        eliminateTransitiveBalances(finalBalances)
+        eliminateTransitiveBalances(balances)
     }
 
     private fun eliminateTransitiveBalances(balances: List<Balance>): List<Balance> {

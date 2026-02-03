@@ -32,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -97,7 +98,7 @@ fun ExpenseListScreen(
                     )
                 }
             } else {
-                items(expenses) {
+                items(expenses, key = { it.id.toString() }) {
                     Box {
                         var menuExpanded by remember { mutableStateOf(false) }
                         ListItem(

@@ -66,9 +66,13 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.material3)
     implementation(libs.wear.compose.navigation)
+    implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material.icons.extended)
 
     implementation(libs.play.services.wearable)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.wear.remote.interactions)
 
     implementation(libs.kotlinx.datetime)
 
