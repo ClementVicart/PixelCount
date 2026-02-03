@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -107,7 +108,7 @@ fun AddExpenseGroupScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 val title by vm.title.collectAsStateWithLifecycle()
-                OutlinedTextField(
+                TextField(
                     value = title,
                     onValueChange = { vm.title.value = it },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -127,91 +128,86 @@ fun AddExpenseGroupScreen(
                     singleLine = true
                 )
 
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    shape = MaterialTheme.shapes.small
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .animateContentSize(MaterialTheme.motionScheme.defaultSpatialSpec()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .animateContentSize(MaterialTheme.motionScheme.defaultSpatialSpec()),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.participants),
-                            style = MaterialTheme.typography.titleMedium
+                    Text(
+                        text = stringResource(Res.string.participants),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    val userName by vm.userName.collectAsStateWithLifecycle()
+                    TextField(
+                        value = userName,
+                        onValueChange = { vm.userName.value = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(Res.string.you)) },
+                        placeholder = { Text(stringResource(Res.string.your_name)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
                         )
+                    )
 
-                        val userName by vm.userName.collectAsStateWithLifecycle()
-                        OutlinedTextField(
-                            value = userName,
-                            onValueChange = { vm.userName.value = it },
+                    val participants by vm.participants.collectAsStateWithLifecycle()
+                    participants.forEach { participant ->
+                        TextField(
+                            value = participant.name,
+                            onValueChange = {},
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text(stringResource(Res.string.you)) },
-                            placeholder = { Text(stringResource(Res.string.your_name)) },
+                            readOnly = true,
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Words,
-                                imeAction = ImeAction.Next
-                            )
-                        )
-
-                        val participants by vm.participants.collectAsStateWithLifecycle()
-                        participants.forEach { participant ->
-                            OutlinedTextField(
-                                value = participant.name,
-                                onValueChange = {},
-                                modifier = Modifier.fillMaxWidth(),
-                                readOnly = true,
-                                singleLine = true,
-                                trailingIcon = {
-                                    FilledTonalIconButton(
-                                        onClick = { vm.deleteParticipant(participant) },
-                                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer
-                                        )
-                                    ) {
-                                        Icon(Icons.Default.Delete, null)
-                                    }
-                                }
-                            )
-                        }
-
-                        var newParticipantName by remember { mutableStateOf("") }
-                        OutlinedTextField(
-                            value = newParticipantName,
-                            onValueChange = { newParticipantName = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            label = { Text(stringResource(Res.string.participant_name)) },
-                            placeholder = { Text(stringResource(Res.string.john_doe)) },
                             trailingIcon = {
-                                FilledIconButton(
-                                    onClick = {
-                                        vm.addParticipant(newParticipantName)
-                                        newParticipantName = ""
-                                    },
-                                    enabled = newParticipantName.isNotBlank(),
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary
+                                FilledTonalIconButton(
+                                    onClick = { vm.deleteParticipant(participant) },
+                                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer
                                     )
                                 ) {
-                                    Icon(Icons.Default.PersonAdd, null)
+                                    Icon(Icons.Default.Delete, null)
                                 }
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Words,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    vm.addParticipant(newParticipantName)
-                                    newParticipantName = ""
-                                }
-                            )
+                            }
                         )
                     }
+
+                    var newParticipantName by remember { mutableStateOf("") }
+                    TextField(
+                        value = newParticipantName,
+                        onValueChange = { newParticipantName = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text(stringResource(Res.string.participant_name)) },
+                        placeholder = { Text(stringResource(Res.string.john_doe)) },
+                        trailingIcon = {
+                            FilledIconButton(
+                                onClick = {
+                                    vm.addParticipant(newParticipantName)
+                                    newParticipantName = ""
+                                },
+                                enabled = newParticipantName.isNotBlank(),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Icon(Icons.Default.PersonAdd, null)
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                vm.addParticipant(newParticipantName)
+                                newParticipantName = ""
+                            }
+                        )
+                    )
                 }
 
                 Text(
@@ -231,7 +227,7 @@ fun AddExpenseGroupScreen(
                     onExpandedChange = { menuExpanded = it },
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = query,
                         onValueChange = { query = it },
                         leadingIcon = {
@@ -240,7 +236,7 @@ fun AddExpenseGroupScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuExpanded) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        colors = ExposedDropdownMenuDefaults.textFieldColors()
                     )
 
                     ExposedDropdownMenu(

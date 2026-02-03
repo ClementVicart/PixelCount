@@ -216,7 +216,7 @@ fun AddExpenseScreen(
                 val title by vm.title.collectAsStateWithLifecycle()
                 val emoji by vm.emoji.collectAsStateWithLifecycle()
 
-                TextField(
+                OutlinedTextField(
                     value = title,
                     onValueChange = { vm.title.value = it },
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -233,7 +233,7 @@ fun AddExpenseScreen(
 
             val amount by vm.amount.collectAsStateWithLifecycle()
 
-            TextField(
+            OutlinedTextField(
                 value = amount,
                 onValueChange = {
                     if(it.isEmpty()) {
