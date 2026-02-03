@@ -94,6 +94,7 @@ import dev.vicart.pixelcount.shared.model.Participant
 import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import dev.vicart.pixelcount.shared.utils.prettyPrint
 import dev.vicart.pixelcount.ui.components.BackButton
+import dev.vicart.pixelcount.ui.components.EmojiPicker
 import dev.vicart.pixelcount.ui.components.ParticipantSelector
 import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.AddExpenseViewModel
@@ -213,13 +214,20 @@ fun AddExpenseScreen(
                     + fadeOut(MaterialTheme.motionScheme.fastEffectsSpec())
             ) {
                 val title by vm.title.collectAsStateWithLifecycle()
+                val emoji by vm.emoji.collectAsStateWithLifecycle()
 
                 TextField(
                     value = title,
                     onValueChange = { vm.title.value = it },
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     label = { Text(stringResource(Res.string.title)) },
-                    singleLine = true
+                    singleLine = true,
+                    leadingIcon = {
+                        EmojiPicker(
+                            emoji = emoji,
+                            onEmojiSelected = { vm.emoji.value = it }
+                        )
+                    }
                 )
             }
 

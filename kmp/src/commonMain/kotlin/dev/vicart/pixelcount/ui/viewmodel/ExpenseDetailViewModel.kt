@@ -61,7 +61,8 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
             amount = balance.amount,
             paidBy = balance.from,
             sharedWith = listOf(balance.to),
-            datetime = Clock.System.now()
+            datetime = Clock.System.now(),
+            emoji = "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1"
         )
 
         viewModelScope.launch {

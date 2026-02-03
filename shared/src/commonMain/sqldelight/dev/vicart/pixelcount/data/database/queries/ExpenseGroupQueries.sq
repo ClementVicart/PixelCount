@@ -26,13 +26,13 @@ deleteParticipantIdNotIn:
 DELETE FROM ExpenseParticipant WHERE id NOT IN ? AND eg_id=?;
 
 insertExpense:
-INSERT INTO ExpenseGroupExpense(id, type, label, amount, datetime) VALUES (?, ?, ?, ?, ?);
+INSERT INTO ExpenseGroupExpense(id, type, label, amount, datetime, emoji) VALUES (?, ?, ?, ?, ?, ?);
 
 insertExpenseWithParticipant:
 INSERT INTO ExpenseGroupExpenseParticipant(ege_id, ep_id, payer) VALUES (?, ?, ?);
 
 updateExpense:
-UPDATE ExpenseGroupExpense SET label=?, amount=? WHERE id=?;
+UPDATE ExpenseGroupExpense SET label=?, amount=?, emoji=? WHERE id=?;
 
 deleteExpenseWithParticipantByExpenseId:
 DELETE FROM ExpenseGroupExpenseParticipant WHERE ege_id=?;

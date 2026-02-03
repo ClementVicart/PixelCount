@@ -514,10 +514,7 @@ private fun ExpensesList(
                                     }
                                 }
                             },
-                            trailingContent = (@Composable {
-                                Icon(Icons.Default.Attachment, null)
-                            }).takeIf { expansesContainingImage.contains(expense) },
-                            leadingContent = {
+                            trailingContent = {
                                 Icon(
                                     imageVector = when(expense.type) {
                                         PaymentTypeEnum.PAYMENT -> Icons.Default.CreditCard
@@ -525,6 +522,12 @@ private fun ExpensesList(
                                         PaymentTypeEnum.TRANSFER -> Icons.AutoMirrored.Default.CompareArrows
                                     },
                                     contentDescription = null
+                                )
+                            },
+                            leadingContent = {
+                                Text(
+                                    text = expense.emoji,
+                                    fontSize = with(LocalDensity.current) { 24.dp.toSp() }
                                 )
                             }
                         )

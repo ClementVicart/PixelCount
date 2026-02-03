@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS ExpenseGroupExpense (
     type TEXT AS PaymentTypeEnum NOT NULL,
     amount REAL NOT NULL,
     label TEXT NOT NULL,
-    datetime INTEGER AS Instant NOT NULL
+    datetime INTEGER AS Instant NOT NULL,
+    emoji TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ExpenseGroupExpenseParticipant (

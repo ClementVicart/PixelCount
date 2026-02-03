@@ -48,7 +48,8 @@ private val selectAllMapper = { lst: List<SelectAll> ->
                             .contains(participant.id)
                     },
                     datetime = it.value.first().datetime!!,
-                    type = it.value.first().type!!
+                    type = it.value.first().type!!,
+                    emoji = it.value.first().emoji
                 )
             },
             currency = it.value.first().currency
@@ -84,7 +85,8 @@ private val selectWhereIdMapper = { lst: List<SelectWhereId> ->
                         it.value.filter { it.payer == false }.map { it.id_ }.contains(participant.id)
                     },
                     datetime = it.value.first().datetime!!,
-                    type = it.value.first().type!!
+                    type = it.value.first().type!!,
+                    emoji = it.value.first().emoji_!!
                 )
             },
             currency = it.value.first().currency
@@ -152,7 +154,7 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
 
     suspend fun insertExpense(expense: Expense) = withContext(Dispatchers.IO) {
         queries.transaction {
-            queries.insertExpense(expense.id, expense.type, expense.label, expense.amount, expense.datetime)
+            queries.insertExpense(expense.id, expense.type, expense.label, expense.amount, expense.datetime, expense.emoji)
             queries.insertExpenseWithParticipant(expense.id, expense.paidBy.id, true)
             expense.sharedWith.forEach { participant ->
                 queries.insertExpenseWithParticipant(expense.id, participant.id, false)
@@ -162,7 +164,7 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
 
     suspend fun updateExpense(expense: Expense) = withContext(Dispatchers.IO) {
         queries.transaction {
-            queries.updateExpense(expense.label, expense.amount, expense.id)
+            queries.updateExpense(expense.label, expense.amount, expense.emoji, expense.id)
             queries.deleteExpenseWithParticipantByExpenseId(expense.id)
             queries.insertExpenseWithParticipant(expense.id, expense.paidBy.id, true)
             expense.sharedWith.forEach { participant ->

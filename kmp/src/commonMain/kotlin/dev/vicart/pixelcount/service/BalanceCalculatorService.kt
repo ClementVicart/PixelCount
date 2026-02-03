@@ -6,6 +6,8 @@ import dev.vicart.pixelcount.shared.model.Participant
 import dev.vicart.pixelcount.shared.model.PaymentTypeEnum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.collections.forEach
 
 class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
@@ -33,7 +35,9 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
             }
         }
 
-        eliminateTransitiveBalances(balances).filterNot { it.amount == 0.0 }
+        eliminateTransitiveBalances(balances).filterNot {
+            BigDecimal(it.amount).setScale(2, RoundingMode.HALF_DOWN).compareTo(BigDecimal.ZERO) == 0
+        }
     }
 
     private fun eliminateTransitiveBalances(balances: List<Balance>): List<Balance> {

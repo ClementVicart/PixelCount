@@ -12,5 +12,6 @@ data class Expense(
     val amount: Double,
     val paidBy: Participant,
     val sharedWith: List<Participant>,
-    val datetime: Instant
+    val datetime: Instant,
+    val emoji: String
 )

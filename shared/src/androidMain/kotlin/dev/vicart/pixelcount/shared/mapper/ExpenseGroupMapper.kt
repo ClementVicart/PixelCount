@@ -62,7 +62,8 @@ object ExpenseGroupMapper {
                     datetime = Instant.fromEpochMilliseconds(it.getLong("datetime")),
                     paidBy = toParticipant(it.getDataMap("paidBy")!!),
                     sharedWith = it.getDataMapArrayList("sharedWith")?.map(::toParticipant)
-                        ?: emptyList()
+                        ?: emptyList(),
+                    emoji = it.getString("emoji").orEmpty()
                 )
             } ?: emptyList()
         )

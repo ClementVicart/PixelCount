@@ -37,6 +37,8 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
 
     val title = MutableStateFlow(initial?.label ?: "")
 
+    val emoji = MutableStateFlow(initial?.emoji ?: "\uD83D\uDED2")
+
     val amount = MutableStateFlow(initial?.amount?.prettyPrint ?: "")
 
     val transferTo = MutableStateFlow(initial?.sharedWith?.firstOrNull())
@@ -102,7 +104,8 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
             paidBy = paidBy.value!!,
             sharedWith = if(paymentType.value == PaymentTypeEnum.TRANSFER) listOf(transferTo.value!!) else sharedWith.value!!,
             datetime = Clock.System.now(),
-            type = paymentType.value
+            type = paymentType.value,
+            emoji = emoji.value
         )
         viewModelScope.launch {
             tempPicture.value?.let {
