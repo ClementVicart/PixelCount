@@ -33,7 +33,7 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
             }
         }
 
-        eliminateTransitiveBalances(balances)
+        eliminateTransitiveBalances(balances).filterNot { it.amount == 0.0 }
     }
 
     private fun eliminateTransitiveBalances(balances: List<Balance>): List<Balance> {
