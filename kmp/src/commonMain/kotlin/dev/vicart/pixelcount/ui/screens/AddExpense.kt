@@ -287,7 +287,6 @@ fun AddExpenseScreen(
                 if(it) {
                     SharePaymentParticipantList(
                         amount = amount,
-                        paidBy = paidBy,
                         vm = vm,
                         group = group
                     )
@@ -431,7 +430,6 @@ fun AddExpenseScreen(
 @Composable
 private fun SharePaymentParticipantList(
     amount: String,
-    paidBy: Participant?,
     vm: AddExpenseViewModel,
     group: ExpenseGroup?
 ) {
@@ -446,7 +444,7 @@ private fun SharePaymentParticipantList(
 
         val sharedWith by vm.sharedWith.collectAsStateWithLifecycle()
 
-        group?.participants?.filterNot { it == paidBy }?.forEach { participant ->
+        group?.participants?.forEach { participant ->
             val containerColor by animateColorAsState(
                 targetValue = if(sharedWith?.contains(participant) == true) MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.surfaceContainer,
@@ -457,7 +455,7 @@ private fun SharePaymentParticipantList(
                     (if(sharedWith?.contains(participant) == false)
                         0.0
                     else
-                        ((amount.toDoubleOrNull() ?: 0.0) / (sharedWith.orEmpty().size + 1))
+                        ((amount.toDoubleOrNull() ?: 0.0) / sharedWith.orEmpty().size)
                             ).prettyPrint(it.currency)
                 }
             }

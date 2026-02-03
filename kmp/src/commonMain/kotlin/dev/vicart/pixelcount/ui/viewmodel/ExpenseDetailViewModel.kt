@@ -41,10 +41,6 @@ class ExpenseDetailViewModel(itemId: Uuid) : ViewModel() {
         it.filter { it.to.mandatory }.sumOf { it.amount }
     }
 
-    val availableExpenseImage = expenses.mapLatest {
-        it.flatMap { it.value }.filter { hasImage(it.id) }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     fun deleteExpenseGroup() {
         viewModelScope.launch {
             ExpenseGroupService.deleteExpenseGroup(expenseGroup.value!!)

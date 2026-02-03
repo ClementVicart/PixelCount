@@ -1,0 +1,13 @@
+CREATE TABLE ExpenseGroupExpenseParticipant2 (
+    ege_id TEXT AS Uuid NOT NULL,
+    ep_id TEXT AS Uuid NOT NULL,
+    payer INTEGER AS Boolean NOT NULL,
+    PRIMARY KEY (ege_id, ep_id, payer),
+    FOREIGN KEY(ege_id) REFERENCES ExpenseGroupExpense(id),
+    FOREIGN KEY(ep_id) REFERENCES ExpenseParticipant(id)
+) WITHOUT ROWID;
+
+INSERT INTO ExpenseGroupExpenseParticipant2(ege_id, ep_id, payer) SELECT ege_id, ep_id, payer FROM ExpenseGroupExpenseParticipant;
+DROP TABLE ExpenseGroupExpenseParticipant;
+
+ALTER TABLE ExpenseGroupExpenseParticipant2 RENAME TO ExpenseGroupExpenseParticipant;

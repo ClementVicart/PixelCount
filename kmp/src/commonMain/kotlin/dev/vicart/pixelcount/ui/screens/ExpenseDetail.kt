@@ -79,6 +79,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -439,8 +440,6 @@ private fun ExpensesList(
     } else {
         val expensesGrouped by vm.expenses.collectAsStateWithLifecycle(emptyMap())
 
-        val expansesContainingImage by vm.availableExpenseImage.collectAsStateWithLifecycle()
-
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -488,30 +487,36 @@ private fun ExpensesList(
                                 )
                             }.takeIf { animateItem } ?: Modifier),
                             supportingContent = {
-                                FlowRow(
+                                Row(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    itemVerticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Badge(
-                                        containerColor = MaterialTheme.colorScheme.tertiary
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                                        shape = CircleShape
                                     ) {
-                                        Text(expense.paidBy.name)
+                                        Text(
+                                            text = expense.paidBy.name,
+                                            fontWeight = FontWeight.Bold,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            modifier = Modifier.padding(horizontal = 4.dp)
+                                        )
                                     }
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.ArrowRightAlt,
                                         contentDescription = null
                                     )
-                                    expense.sharedWith.forEach { participant ->
-                                        Badge(
-                                            containerColor = Color.Transparent,
-                                            modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.outline,
-                                                CircleShape
-                                            ),
-                                            contentColor = MaterialTheme.colorScheme.tertiary
-                                        ) {
-                                            Text(participant.name)
-                                        }
-                                    }
+                                    Text(
+                                        text = expense.sharedWith.joinToString(separator = " • ") {
+                                            it.name
+                                        },
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             },
                             trailingContent = {

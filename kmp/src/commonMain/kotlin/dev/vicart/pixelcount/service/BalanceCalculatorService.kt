@@ -16,7 +16,7 @@ class BalanceCalculatorService(private val expenseGroup: ExpenseGroup) {
         val totalAmountDuePerParticipant = expenseGroup.expenses.filter { it.type != PaymentTypeEnum.TRANSFER }.groupBy { it.paidBy }.mapValues { entry ->
             entry.value.flatMap { expense ->
                 expense.sharedWith.map {
-                    it to (expense.amount / (expense.sharedWith.size+1))
+                    it to (expense.amount / expense.sharedWith.size)
                 }
             }.fold(mutableMapOf<Participant, Double>()) { acc, pair ->
                 acc[pair.first] = acc.getOrPut(pair.first) { 0.0 } + pair.second

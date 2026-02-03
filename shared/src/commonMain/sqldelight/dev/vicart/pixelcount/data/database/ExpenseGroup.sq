@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS ExpenseGroupExpenseParticipant (
     ege_id TEXT AS Uuid NOT NULL,
     ep_id TEXT AS Uuid NOT NULL,
     payer INTEGER AS Boolean NOT NULL,
-    PRIMARY KEY (ege_id, ep_id),
+    PRIMARY KEY (ege_id, ep_id, payer),
     FOREIGN KEY(ege_id) REFERENCES ExpenseGroupExpense(id),
     FOREIGN KEY(ep_id) REFERENCES ExpenseParticipant(id)
 ) WITHOUT ROWID;

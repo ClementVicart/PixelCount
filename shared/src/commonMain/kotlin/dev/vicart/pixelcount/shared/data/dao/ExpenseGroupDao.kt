@@ -134,11 +134,14 @@ class ExpenseGroupDao(database: PixelCountDatabase) {
             queries.updateExpenseGroup(group.title, group.emoji, group.currency, group.id)
             val existingGroup = queries.selectWhereId(group.id).executeAsList().let(selectWhereIdMapper)
             val existingParticipants = existingGroup.flatMap(ExpenseGroup::participants)
-            val newParticipants = group.participants - existingParticipants.toSet()
+            group.participants.filter { existingParticipants.map(Participant::id).contains(it.id) }.forEach { participant ->
+                queries.updateParticipant(participant.name, participant.id)
+            }
+            val newParticipants = group.participants.filterNot { existingParticipants.map(Participant::id).contains(it.id) }
             newParticipants.forEach {
                 queries.insertParticipant(it.id, it.name, it.mandatory, group.id)
             }
-            val deletedParticipants = existingParticipants - group.participants.toSet()
+            val deletedParticipants = existingParticipants.filterNot { group.participants.map(Participant::id).contains(it.id) }
             deletedParticipants.forEach { participant ->
                 val paidExpenses = existingGroup.flatMap(ExpenseGroup::expenses).filter { it.paidBy == participant }
                 launch {

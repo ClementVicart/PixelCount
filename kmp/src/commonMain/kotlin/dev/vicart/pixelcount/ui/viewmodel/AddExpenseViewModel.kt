@@ -68,7 +68,7 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
                 paidBy.value = it?.participants?.single { it.mandatory }
             }
             if(sharedWith.value == null) {
-                sharedWith.value = it?.participants?.filterNot { paidBy.value == it }
+                sharedWith.value = it?.participants
             }
             if(transferTo.value == null) {
                 transferTo.value = it?.participants?.filterNot { paidBy.value == it }?.firstOrNull()
@@ -86,7 +86,7 @@ class AddExpenseViewModel(itemId: Uuid, private val initial: Expense?) : ViewMod
 
     fun changePaidBy(participant: Participant) {
         paidBy.value = participant
-        sharedWith.value = expenseGroup.value?.participants?.filterNot { paidBy.value == it }
+        sharedWith.value = expenseGroup.value?.participants
     }
 
     fun addExpense() {

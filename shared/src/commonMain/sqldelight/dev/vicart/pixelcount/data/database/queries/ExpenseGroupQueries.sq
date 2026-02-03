@@ -19,6 +19,9 @@ INSERT INTO ExpenseGroup(id, title, emoji, currency) VALUES (?, ?, ?, ?);
 insertParticipant:
 INSERT INTO ExpenseParticipant(id, name, mandatory, eg_id) VALUES (?, ?, ?, ?);
 
+updateParticipant:
+UPDATE ExpenseParticipant SET name=? WHERE id=?;
+
 updateExpenseGroup:
 UPDATE ExpenseGroup SET title=?, emoji=?, currency=? WHERE id=?;
 

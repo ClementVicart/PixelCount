@@ -81,6 +81,12 @@ fun createDatabase(driverFactory: DriverFactory) : PixelCountDatabase {
         )
     )
 
+    PixelCountDatabase.Schema.migrate(
+        driver = driver,
+        oldVersion = 2,
+        newVersion = PixelCountDatabase.Schema.version
+    )
+
     return database
 }
 
