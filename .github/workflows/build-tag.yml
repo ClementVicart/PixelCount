@@ -124,6 +124,8 @@ jobs:
     name: Create release tag
     needs: [ build-jar, build-android-bundle ]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v7
