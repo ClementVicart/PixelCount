@@ -1,6 +1,7 @@
 package dev.vicart.pixelcount.ui.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -56,6 +57,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -67,9 +69,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -111,6 +115,7 @@ import dev.vicart.pixelcount.ui.components.EmptyContent
 import dev.vicart.pixelcount.ui.transition.LocalSharedTransitionScope
 import dev.vicart.pixelcount.ui.viewmodel.ExpenseDetailViewModel
 import dev.vicart.pixelcount.util.prettyPrint
+import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 import kotlin.uuid.Uuid
@@ -239,21 +244,28 @@ fun ExpenseDetailScreen(
         }
 
         if(shouldShowToolbar) {
-            NewPaymentFab(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .safeContentPadding()
-                    .then(with(LocalSharedTransitionScope.current) {
-                        Modifier.sharedBounds(
-                            sharedContentState = rememberSharedContentState("new_payment_fab"),
-                            animatedVisibilityScope = LocalNavAnimatedContentScope.current
-                        )
-                    }.takeIf { !animateExpenseItem } ?: Modifier),
-                onClick = {
-                    animateExpenseItem = false
-                    onAddExpense()
-                }
-            )
+
+            AnimatedVisibility(
+                visible = bottomSheetState.targetValue != SheetValue.Expanded,
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .safeContentPadding(),
+                enter = scaleIn(MotionScheme.standard().defaultEffectsSpec()),
+                exit = scaleOut(MotionScheme.standard().defaultEffectsSpec())
+            ) {
+                NewPaymentFab(
+                    modifier = Modifier
+                        .then(with(LocalSharedTransitionScope.current) {
+                            Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState("new_payment_fab"),
+                                animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                            )
+                        }.takeIf { !animateExpenseItem } ?: Modifier),
+                    onClick = {
+                        animateExpenseItem = false
+                        onAddExpense()
+                    }
+                )
+            }
         }
     }
 }
@@ -311,8 +323,7 @@ private fun DetailSheetContent(
                 (fadeIn(MotionScheme.expressive().defaultEffectsSpec()) + scaleIn(MotionScheme.expressive().defaultSpatialSpec()))
                     .togetherWith(fadeOut(MotionScheme.expressive().defaultEffectsSpec()) + scaleOut(
                         MotionScheme.expressive().defaultSpatialSpec()))
-            },
-            modifier = Modifier.padding(bottom = 96.dp)
+            }
         ) {
             if(it == 0) {
                 ExpensesList(
