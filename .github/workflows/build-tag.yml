@@ -119,3 +119,20 @@ jobs:
           packageName: dev.vicart.pixelcount
           track: wear:internal
           status: draft
+
+  create-release:
+    name: Create release tag
+    needs: [ build-jar, build-android-bundle ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
+
+      - name: Create release tag
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ github.ref_name }}
+          files: |
+            pixelcount-android/androidApp-release.aab
+            pixelcount-wearos/wearosApp-release.aab
+            pixelcount-*/PixelCount-*-release.jar
