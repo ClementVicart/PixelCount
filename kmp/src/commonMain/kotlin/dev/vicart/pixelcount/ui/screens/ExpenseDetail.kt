@@ -135,7 +135,7 @@ fun ExpenseDetailScreen(
 
     val currentWindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val shouldShowToolbar = remember(currentWindowSizeClass) {
-        currentWindowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
+        currentWindowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
     }
     val density = LocalDensity.current
 
@@ -182,14 +182,8 @@ fun ExpenseDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = group?.emoji.orEmpty(),
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Column(
@@ -571,7 +565,17 @@ private fun TopBar(
         subtitle = { Text(stringResource(Res.string.created_by, group?.participants?.firstOrNull { it.mandatory }
             ?.name.orEmpty())) },
         navigationIcon = {
-            BackButton(onBack)
+            BackButton(
+                onClick = onBack,
+                additionalContent = {
+                    group?.let {
+                        Text(
+                            text = it.emoji,
+                            fontSize = with(LocalDensity.current) { 24.dp.toSp() }
+                        )
+                    }
+                }
+            )
         },
         actions = {
             if(!shouldShowToolbar) {

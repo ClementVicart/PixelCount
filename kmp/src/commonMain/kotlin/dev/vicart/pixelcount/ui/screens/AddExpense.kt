@@ -283,7 +283,8 @@ fun AddExpenseScreen(
                         .togetherWith(shrinkOut(MotionScheme.expressive().defaultSpatialSpec()) + fadeOut(
                             MotionScheme.expressive().defaultEffectsSpec()))
                 },
-                contentAlignment = Alignment.TopCenter
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if(it) {
                     SharePaymentParticipantList(
@@ -306,7 +307,8 @@ fun AddExpenseScreen(
                         ParticipantSelector(
                             participants = group?.participants?.filterNot { it == paidBy }.orEmpty(),
                             selectedParticipant = transferTo,
-                            onParticipantSelected = { vm.transferTo.value = it }
+                            onParticipantSelected = { vm.transferTo.value = it },
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }

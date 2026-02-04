@@ -14,11 +14,11 @@ object Screens {
 
         @Serializable
         data class Detail(val id: Uuid) : NavKey
+
+        @Serializable
+        data class AddExpense(val itemId: Uuid, val initial: dev.vicart.pixelcount.shared.model.Expense? = null) : NavKey
     }
 
     @Serializable
     data class AddExpenseGroup(val item: ExpenseGroup? = null) : NavKey
-
-    @Serializable
-    data class AddExpense(val itemId: Uuid, val initial: dev.vicart.pixelcount.shared.model.Expense? = null) : NavKey
 }

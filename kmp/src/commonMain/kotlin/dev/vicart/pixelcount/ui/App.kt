@@ -2,6 +2,9 @@ package dev.vicart.pixelcount.ui
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldDefaults
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
@@ -42,7 +45,7 @@ fun App() = AppTheme {
                     subclass(Screens.Expense.List::class)
                     subclass(Screens.AddExpenseGroup::class)
                     subclass(Screens.Expense.Detail::class)
-                    subclass(Screens.AddExpense::class)
+                    subclass(Screens.Expense.AddExpense::class)
                 }
             }
         },
@@ -105,10 +108,10 @@ fun App() = AppTheme {
                                 backStack.add(Screens.AddExpenseGroup(it))
                             },
                             onAddExpense = {
-                                backStack.add(Screens.AddExpense(entry.id))
+                                backStack.add(Screens.Expense.AddExpense(entry.id))
                             },
                             onEditExpense = {
-                                backStack.add(Screens.AddExpense(entry.id, it))
+                                backStack.add(Screens.Expense.AddExpense(entry.id, it))
                             }
                         )
                     }
@@ -122,8 +125,9 @@ fun App() = AppTheme {
                             initial = it.item
                         )
                     }
-                    entry<Screens.AddExpense>(
-                        metadata = transitionAxisMetadata(TransitionAxis.Y)
+                    entry<Screens.Expense.AddExpense>(
+                        metadata = transitionAxisMetadata(TransitionAxis.Y) +
+                                ListDetailSceneStrategy.extraPane(sceneKey = Screens.Expense)
                     ) {
                         AddExpenseScreen(
                             onBack = {
