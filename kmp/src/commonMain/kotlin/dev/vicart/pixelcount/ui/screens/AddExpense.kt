@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -469,7 +470,7 @@ private fun SharePaymentParticipantList(
                     else MaterialTheme.colorScheme.onSurface
                 ),
                 modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
+                    .clip(if(sharedWith?.contains(participant) == true) MaterialTheme.shapes.small else CircleShape)
                     .selectable(selected = sharedWith?.contains(participant) == true) {
                         vm.toggleShareParticipant(participant)
                     },
@@ -478,7 +479,7 @@ private fun SharePaymentParticipantList(
                         text = amountForParticipant,
                         style = MaterialTheme.typography.bodyLarge
                     )
-                }
+                },
             )
         }
     }

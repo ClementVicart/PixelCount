@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.kotlinx.json)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.splashscreen)
 
     implementation(libs.play.services.wearable)
 }

@@ -63,6 +63,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -245,27 +246,27 @@ fun ExpenseDetailScreen(
 
         if(shouldShowToolbar) {
 
-            AnimatedVisibility(
-                visible = bottomSheetState.targetValue != SheetValue.Expanded,
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .safeContentPadding(),
-                enter = scaleIn(MotionScheme.standard().defaultEffectsSpec()),
-                exit = scaleOut(MotionScheme.standard().defaultEffectsSpec())
-            ) {
-                NewPaymentFab(
-                    modifier = Modifier
-                        .then(with(LocalSharedTransitionScope.current) {
-                            Modifier.sharedBounds(
-                                sharedContentState = rememberSharedContentState("new_payment_fab"),
-                                animatedVisibilityScope = LocalNavAnimatedContentScope.current
-                            )
-                        }.takeIf { !animateExpenseItem } ?: Modifier),
-                    onClick = {
-                        animateExpenseItem = false
-                        onAddExpense()
-                    }
-                )
-            }
+            NewPaymentFab(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .safeContentPadding()
+                    .then(with(LocalSharedTransitionScope.current) {
+                        Modifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState("new_payment_fab"),
+                            animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                        )
+                    }.takeIf { !animateExpenseItem } ?: Modifier)
+                    .animateFloatingActionButton(
+                        visible = bottomSheetState.targetValue != SheetValue.Expanded,
+                        alignment = Alignment.Center,
+                        scaleAnimationSpec = MotionScheme.expressive().defaultSpatialSpec(),
+                        alphaAnimationSpec = MotionScheme.expressive().defaultEffectsSpec()
+                    ),
+                onClick = {
+                    animateExpenseItem = false
+                    onAddExpense()
+                }
+            )
         }
     }
 }
