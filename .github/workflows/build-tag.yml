@@ -32,7 +32,7 @@ jobs:
           ${{ env.GRADLE_WRAPPER_SCRIPT }} --no-daemon packageReleaseUberJarForCurrentOS '-Papp.version=${{ github.ref_name }}'
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pixelcount-${{ matrix.os }}
           path: kmp/build/compose/jars/PixelCount-*-release.jar
@@ -79,14 +79,14 @@ jobs:
             -Papp.versionCode=${{ env.VERSION_CODE }}2
 
       - name: Upload Android Bundle
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         id: publish-android
         with:
           name: pixelcount-android
           path: androidApp/build/outputs/bundle/release/androidApp-release.aab
 
       - name: Upload Wear OS Bundle
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         id: publish-wearos
         with:
           name: pixelcount-wearos
