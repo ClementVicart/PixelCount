@@ -30,7 +30,7 @@ phone-interaction = "1.2.0"
 play-services-wearable = "19.0.0"
 
 # Data
-sqldelight = "2.2.1"
+sqldelight = "2.3.2"
 
 [libraries]
 # Compose
