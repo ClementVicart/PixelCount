@@ -9,7 +9,7 @@ datetime = "0.7.1"
 agp = "9.1.0"
 compileSdk = "36"
 minSdk = "30"
-activity = "1.12.4"
+activity = "1.13.0"
 material = "1.13.0"
 splashscreen = "1.2.0"
 
