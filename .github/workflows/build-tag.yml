@@ -53,7 +53,7 @@ jobs:
           java-version: 25
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Set gradle permission
         run: chmod +x gradlew
