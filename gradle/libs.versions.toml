@@ -23,7 +23,7 @@ lifecycle = "2.10.0-alpha06"
 qrcode = "4.5.0"
 
 # Compose Wear
-compose-wear = "1.5.6"
+compose-wear = "1.6.0"
 phone-interaction = "1.2.0"
 
 # GMS
