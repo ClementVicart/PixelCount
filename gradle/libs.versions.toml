@@ -27,7 +27,7 @@ compose-wear = "1.6.1"
 phone-interaction = "1.2.0"
 
 # GMS
-play-services-wearable = "19.0.0"
+play-services-wearable = "20.0.1"
 
 # Data
 sqldelight = "2.3.2"
